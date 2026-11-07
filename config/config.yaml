@@ -1,0 +1,21 @@
+data:
+  url: https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt
+  path: data/input.txt
+  train_fraction: 0.9
+
+# CPU-friendly default. GPU preset: n_embd=384, n_head=6, n_layer=6,
+# block_size=256, dropout=0.2, batch_size=64, learning_rate=3.0e-4
+model:
+  n_embd: 64
+  n_head: 4
+  n_layer: 4
+  block_size: 64
+  dropout: 0.1
+
+training:
+  batch_size: 32
+  learning_rate: 1.0e-3
+  max_iters: 3000
+  eval_interval: 300
+  eval_iters: 100
+  seed: 1337

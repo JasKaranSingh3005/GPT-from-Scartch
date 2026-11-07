@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+data/*.txt
+outputs/
+runs/
+.pytest_cache/
+.ipynb_checkpoints/
+.vscode/
+.idea/
+*.egg-info/
+.DS_Store
+Thumbs.db
