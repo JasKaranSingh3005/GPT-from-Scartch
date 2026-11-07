@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+from typing import Iterator
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -33,14 +33,18 @@ def next_token_probs(
 
 
 def sample_next_token(
-    logits: torch.Tensor, temperature: float = 1.0, top_k: int | None = None
+    logits: torch.Tensor,
+    temperature: float = 1.0,
+    top_k: int | None = None,
+    generator: torch.Generator | None = None,
 ) -> torch.Tensor:
     """Sample one token ID per row from next-token logits.
 
-    logits: (B, V) -> returns (B, 1) integer tensor.
+    logits: (B, V) -> returns (B, 1) integer tensor. Pass a `generator` for a private
+    random stream; with None, the global PyTorch RNG is used (the original behaviour).
     """
     probs = next_token_probs(logits, temperature, top_k)
-    return torch.multinomial(probs, num_samples=1)
+    return torch.multinomial(probs, num_samples=1, generator=generator)
 
 
 def encode_prompt(tokenizer: CharTokenizer, prompt: str) -> list[int]:
@@ -67,3 +71,39 @@ def generate_text(
     idx = torch.tensor([encode_prompt(tokenizer, prompt)], dtype=torch.long, device=device)
     out = model.generate(idx, max_new_tokens, temperature=temperature, top_k=top_k)
     return tokenizer.decode(out[0].tolist())
+
+@torch.no_grad()
+def generate_stream(
+    model: nn.Module,
+    idx: torch.Tensor,
+    max_new_tokens: int,
+    temperature: float = 1.0,
+    top_k: int | None = None,
+    generator: torch.Generator | None = None,
+) -> Iterator[int]:
+    """Yield each newly sampled token ID (single sequence, idx of shape (1, T)).
+
+    Same algorithm as GPT.generate: crop the context to block_size (if the model has
+    one), take the last position's logits, sample, append. The model is switched to
+    eval mode and its previous mode restored when the stream ends or is closed.
+    """
+    if idx.ndim != 2 or idx.size(0) != 1 or idx.size(1) < 1:
+        raise ValueError("idx must have shape (1, T) with T >= 1")
+    # Validate eagerly (a generator function would otherwise only fail on first next()).
+    next_token_probs(torch.zeros(1, 2), temperature, top_k)
+    return _stream(model, idx, max_new_tokens, temperature, top_k, generator)
+
+
+def _stream(model, idx, max_new_tokens, temperature, top_k, generator) -> Iterator[int]:
+    block_size = getattr(model, "block_size", None)
+    was_training = model.training
+    model.eval()
+    try:
+        for _ in range(max_new_tokens):
+            cond = idx[:, -block_size:] if block_size else idx
+            logits, _ = model(cond)
+            nxt = sample_next_token(logits[:, -1, :], temperature, top_k, generator)
+            idx = torch.cat([idx, nxt], dim=1)
+            yield int(nxt.item())
+    finally:
+        model.train(was_training)
