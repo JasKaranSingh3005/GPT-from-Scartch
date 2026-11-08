@@ -15,12 +15,14 @@
     "@fontsource-variable/inter": "^5.0.0",
     "@fontsource-variable/jetbrains-mono": "^5.0.0",
     "@tanstack/react-query": "^5.51.0",
+    "@xyflow/react": "^12.3.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.400.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.0",
-    "zustand": "^4.5.4"
+    "zustand": "^4.5.4",
+    "recharts": "^2.12.7"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.8",

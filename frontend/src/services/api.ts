@@ -9,6 +9,13 @@ import type {
   UnloadResponse,
   CompareRequest,
   CompareResponse,
+  AttentionRequest, 
+  AttentionResponse, 
+  DecodeResponse, 
+  EncodeResponse, 
+  VocabularyResponse,
+  ArchitectureResponse, 
+  ForwardPassResponse,
 } from "../types/api";
 
 export const API_BASE = (import.meta.env.VITE_API_URL ?? "http://localhost:8000/api/v1").replace(
@@ -74,5 +81,11 @@ export const api = {
   modelParameters: (id: string) => request<ParametersResponse>(`${modelPath(id)}/parameters`),
   loadModel: (id: string) => request<LoadResponse>("/models/load", post({ model_id: id })),
   unloadModel: (id: string) => request<UnloadResponse>("/models/unload", post({ model_id: id })),
-    compare: (body: CompareRequest) => request<CompareResponse>("/generate/compare", post(body)),
+  compare: (body: CompareRequest) => request<CompareResponse>("/generate/compare", post(body)),
+  encode: (modelId: string, text: string) =>request<EncodeResponse>("/tokenizer/encode", post({ model_id: modelId, text })),
+  decode: (modelId: string, ids: number[]) =>request<DecodeResponse>("/tokenizer/decode", post({ model_id: modelId, ids })),
+  vocabulary: (modelId: string) =>request<VocabularyResponse>(`/tokenizer/vocabulary?model_id=${encodeURIComponent(modelId)}`),
+  attention: (body: AttentionRequest) =>request<AttentionResponse>("/visualize/attention", post(body)),
+  architecture: (modelId: string) =>request<ArchitectureResponse>(`/visualize/architecture?model_id=${encodeURIComponent(modelId)}`),
+  forwardPass: (modelId: string, prompt: string) =>request<ForwardPassResponse>("/visualize/forward-pass",post({ model_id: modelId, prompt, max_tokens: 64 }),),
 };

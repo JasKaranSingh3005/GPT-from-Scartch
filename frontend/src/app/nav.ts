@@ -23,9 +23,9 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { path: "/", label: "Dashboard", icon: LayoutDashboard, implemented: true },
   { path: "/playground", label: "GPT Playground", icon: MessageSquare, implemented: true },
-  { path: "/architecture", label: "Architecture Explorer", icon: Network, implemented: false },
-  { path: "/attention", label: "Attention Visualizer", icon: Boxes, implemented: false },
-  { path: "/tokenizer", label: "Tokenizer Explorer", icon: Type, implemented: false },
+  { path: "/architecture", label: "Architecture Explorer", icon: Network, implemented: true },
+  { path: "/attention", label: "Attention Visualizer", icon: Boxes, implemented: true },
+  { path: "/tokenizer", label: "Tokenizer Explorer", icon: Type, implemented: true },
   { path: "/training", label: "Training Lab", icon: Activity, implemented: false },
   { path: "/experiments", label: "Experiment Lab", icon: FlaskConical, implemented: false },
   { path: "/compare", label: "Model Comparison", icon: GitCompare, implemented: false },

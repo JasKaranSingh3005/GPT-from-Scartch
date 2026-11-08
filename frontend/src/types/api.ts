@@ -140,3 +140,86 @@ export interface StreamDone {
   seconds: number;
   tokens_per_second: number;
 }
+
+export interface EncodedToken {
+  char: string;
+  id: number;
+}
+
+export interface EncodeResponse {
+  model_id: string;
+  ids: number[];
+  tokens: EncodedToken[];
+  length: number;
+  vocab_size: number;
+  block_size: number | null;
+}
+
+export interface DecodeResponse {
+  model_id: string;
+  text: string;
+}
+
+export interface VocabEntry {
+  id: number;
+  char: string;
+  codepoint: string;
+}
+
+export interface VocabularyResponse {
+  model_id: string;
+  vocab_size: number;
+  entries: VocabEntry[];
+}
+
+export interface AttentionRequest {
+  model_id: string;
+  prompt: string;
+  layer: number;
+  max_tokens: number;
+}
+
+export interface AttentionResponse {
+  model_id: string;
+  tokens: EncodedToken[];
+  layer: number;
+  n_layers: number;
+  n_heads: number;
+  block_size: number;
+  cropped: boolean;
+  /** weights[head][query][key] */
+  weights: number[][][];
+}
+
+export interface ArchitectureStage {
+  key: string;
+  label: string;
+  input_shape: string;
+  output_shape: string;
+  parameters: number;
+  details: Record<string, number | string>;
+}
+
+export interface ArchitectureResponse {
+  model_id: string;
+  config: Record<string, number>;
+  stages: ArchitectureStage[];
+  parameters_total: number;
+  stage_sum_matches_total: boolean;
+}
+
+export interface TensorStat {
+  name: string;
+  shape: number[];
+  mean: number;
+  std: number;
+  min: number;
+  max: number;
+}
+
+export interface ForwardPassResponse {
+  model_id: string;
+  tokens: EncodedToken[];
+  cropped: boolean;
+  stages: TensorStat[];
+}
