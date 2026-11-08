@@ -5,6 +5,10 @@ from fastapi.responses import JSONResponse
 
 from backend.services.model_registry import CheckpointError, ModelLimitError, ModelNotFoundError
 
+from backend.services.jobs import (
+    JobConflictError, JobNotFoundError, JobRejectedError, QueueFullError, TrainingDisabledError,
+)
+
 
 def install_error_handlers(app: FastAPI) -> None:
     """Map registry exceptions to HTTP status codes with a {'detail': ...} body."""
@@ -19,3 +23,8 @@ def install_error_handlers(app: FastAPI) -> None:
     app.add_exception_handler(CheckpointError, make(422))
     app.add_exception_handler(ModelLimitError, make(409))
     app.add_exception_handler(InvalidRequestError, make(422))
+    app.add_exception_handler(JobNotFoundError, make(404))
+    app.add_exception_handler(JobConflictError, make(409))
+    app.add_exception_handler(JobRejectedError, make(422))
+    app.add_exception_handler(QueueFullError, make(429))
+    app.add_exception_handler(TrainingDisabledError, make(403))

@@ -223,3 +223,53 @@ export interface ForwardPassResponse {
   cropped: boolean;
   stages: TensorStat[];
 }
+
+export type JobStatus = "QUEUED" | "RUNNING" | "COMPLETED" | "FAILED" | "STOPPED";
+
+export interface MetricRow {
+  iter: number;
+  train_loss: number;
+  val_loss: number;
+  elapsed_s: number;
+}
+
+export interface TrainingJob {
+  job_id: string;
+  run_name: string;
+  model_type: string;
+  model_id: string;
+  status: JobStatus;
+  created_at: string;
+  started_at: string | null;
+  finished_at: string | null;
+  device: string;
+  config: { model: Record<string, number>; training: Record<string, number> };
+  error: string | null;
+  resumed_from: string | null;
+  stop_requested: boolean;
+  latest: MetricRow | null;
+  progress: number | null;
+  result: Record<string, unknown> | null;
+}
+
+export interface TrainingJobRequest {
+  name: string;
+  model_type: "gpt" | "bigram";
+  n_embd: number;
+  n_head: number;
+  n_layer: number;
+  block_size: number;
+  dropout: number;
+  batch_size: number;
+  learning_rate: number;
+  max_iters: number;
+  eval_interval: number;
+  eval_iters: number;
+  seed: number;
+}
+
+export interface JobLogs {
+  job_id: string;
+  status: JobStatus;
+  lines: string[];
+}

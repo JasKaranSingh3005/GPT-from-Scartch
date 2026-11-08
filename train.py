@@ -8,6 +8,9 @@ from training.checkpoint import MODEL_TYPES
 from training.train import run_experiment
 from utils.config import load_config
 
+import signal
+import threading
+
 MODEL_FIELDS = {"n_embd": int, "n_head": int, "n_layer": int, "block_size": int, "dropout": float}
 TRAIN_FIELDS = {
     "batch_size": int, "max_iters": int, "eval_interval": int, "eval_iters": int, "seed": int,
@@ -21,6 +24,10 @@ def main() -> None:
     parser.add_argument("--name", default=None, help="run name (default: model + timestamp)")
     parser.add_argument("--out-dir", default="outputs/runs")
     parser.add_argument("--no-tensorboard", action="store_true")
+    parser.add_argument("--resumable", action="store_true",
+                        help="save optimizer and RNG state so the run can be resumed")
+    parser.add_argument("--resume", action="store_true",
+                        help="continue the run named by --name from its last.pt")
     parser.add_argument("--lr", "--learning-rate", dest="learning_rate", type=float, default=None)
     # Optional overrides of values in the config file
     for name, typ in {**MODEL_FIELDS, **TRAIN_FIELDS}.items():
@@ -42,9 +49,23 @@ def main() -> None:
         training=replace(cfg.training, **train_over),
     )
 
+    if args.resume and not args.name:
+        parser.error("--resume needs --name")
+
+    stop = threading.Event()
+
+    def on_sigint(signum, frame):  # first Ctrl+C: stop cleanly; second: abort
+        if stop.is_set():
+            raise KeyboardInterrupt
+        print("\nStopping after the current step (press Ctrl+C again to abort)...")
+        stop.set()
+
+    signal.signal(signal.SIGINT, on_sigint)
+
     name = args.name or f"{args.model}-{datetime.now():%Y%m%d-%H%M%S}"
     run_experiment(
-        cfg, args.model, name, out_root=args.out_dir, use_tensorboard=not args.no_tensorboard
+        cfg, args.model, name, out_root=args.out_dir, use_tensorboard=not args.no_tensorboard,
+        should_stop=stop.is_set, resumable=args.resumable, resume=args.resume,
     )
 
 

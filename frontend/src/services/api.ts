@@ -16,6 +16,9 @@ import type {
   VocabularyResponse,
   ArchitectureResponse, 
   ForwardPassResponse,
+  JobLogs, 
+  TrainingJob, 
+  TrainingJobRequest
 } from "../types/api";
 
 export const API_BASE = (import.meta.env.VITE_API_URL ?? "http://localhost:8000/api/v1").replace(
@@ -88,4 +91,10 @@ export const api = {
   attention: (body: AttentionRequest) =>request<AttentionResponse>("/visualize/attention", post(body)),
   architecture: (modelId: string) =>request<ArchitectureResponse>(`/visualize/architecture?model_id=${encodeURIComponent(modelId)}`),
   forwardPass: (modelId: string, prompt: string) =>request<ForwardPassResponse>("/visualize/forward-pass",post({ model_id: modelId, prompt, max_tokens: 64 }),),
+  trainingJobs: () => request<{ jobs: TrainingJob[] }>("/training/jobs"),
+  trainingJob: (id: string) => request<TrainingJob>(`/training/jobs/${id}`),
+  createJob: (body: TrainingJobRequest) => request<TrainingJob>("/training/jobs", post(body)),
+  stopJob: (id: string) => request<TrainingJob>(`/training/jobs/${id}/stop`, post({})),
+  resumeJob: (id: string, maxIters: number | null) =>request<TrainingJob>(`/training/jobs/${id}/resume`, post({ max_iters: maxIters })),
+  jobLogs: (id: string) => request<JobLogs>(`/training/jobs/${id}/logs?tail=200`),
 };

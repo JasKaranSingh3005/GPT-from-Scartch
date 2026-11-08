@@ -1,5 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../services/api";
+import type { TrainingJob } from "../types/api";
 
 export const useHealth = () =>
   useQuery({ queryKey: ["health"], queryFn: api.health, refetchInterval: 5000 });
@@ -91,3 +92,44 @@ export const useForwardPass = () =>
     mutationFn: ({ modelId, prompt }: { modelId: string; prompt: string }) =>
       api.forwardPass(modelId, prompt),
   });
+
+const ACTIVE = new Set(["QUEUED", "RUNNING"]);
+
+export const useTrainingJobs = () =>
+  useQuery({
+    queryKey: ["jobs"],
+    queryFn: api.trainingJobs,
+    refetchInterval: (q) => (q.state.data?.jobs.some((j) => ACTIVE.has(j.status)) ? 2000 : 10000),
+  });
+
+export const useTrainingJob = (id: string | null) =>
+  useQuery({
+    queryKey: ["job", id],
+    queryFn: () => api.trainingJob(id as string),
+    enabled: id !== null,
+    refetchInterval: (q) => (q.state.data && ACTIVE.has(q.state.data.status) ? 2000 : false),
+  });
+
+export const useJobLogs = (id: string | null, active: boolean) =>
+  useQuery({
+    queryKey: ["job-logs", id],
+    queryFn: () => api.jobLogs(id as string),
+    enabled: id !== null,
+    refetchInterval: active ? 2000 : false,
+  });
+
+function useJobMutation<V>(fn: (v: V) => Promise<TrainingJob>) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: fn,
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["jobs"] });
+      void qc.invalidateQueries({ queryKey: ["job"] });
+      void qc.invalidateQueries({ queryKey: ["models"] });
+    },
+  });
+}
+
+export const useCreateJob = () => useJobMutation(api.createJob);
+export const useStopJob = () => useJobMutation((id: string) => api.stopJob(id));
+export const useResumeJob = () =>useJobMutation(({ id, maxIters }: { id: string; maxIters: number | null }) =>api.resumeJob(id, maxIters));
