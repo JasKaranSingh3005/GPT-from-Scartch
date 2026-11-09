@@ -19,17 +19,29 @@ def run_all(
     force: bool = False,
     use_tensorboard: bool = False,
     run_fn: Callable[..., dict[str, Any]] = run_experiment,
+    should_stop: Callable[[], bool] | None = None,
+    on_variant: Callable[[str, int, int], None] | None = None,
 ) -> tuple[dict[str, dict[str, Any]], dict[str, str]]:
     """Train each variant. Returns (summaries of runs done now, {name: error message}).
 
     A variant whose summary.json already exists is skipped, so an interrupted batch
     can be resumed by running the same command again. One failing run is reported
     and does not stop the others.
+
+    Optional hooks: `should_stop` is checked before each variant and passed to the runs
+    (a stopped run ends the batch); `on_variant(name, index, total)` is called before each
+    variant, including skipped ones.
     """
     summaries: dict[str, dict[str, Any]] = {}
     failures: dict[str, str] = {}
     total = len(variant_names)
+    extra: dict[str, Any] = {"should_stop": should_stop} if should_stop is not None else {}
     for i, name in enumerate(variant_names, 1):
+        if should_stop is not None and should_stop():
+            print("\nStop requested; not starting further runs.")
+            break
+        if on_variant is not None:
+            on_variant(name, i, total)
         if (out_dir / name / "summary.json").is_file() and not force:
             print(f"\n[{i}/{total}] {name}: already done, skipping (use --force to rerun)")
             continue
@@ -38,11 +50,14 @@ def run_all(
         try:
             summaries[name] = run_fn(
                 cfg, VARIANTS[name].model_type, name,
-                out_root=out_dir, use_tensorboard=use_tensorboard,
+                out_root=out_dir, use_tensorboard=use_tensorboard, **extra,
             )
         except Exception as exc:  # keep going; KeyboardInterrupt is not caught
             failures[name] = str(exc)
             print(f"  FAILED: {exc}")
+            continue
+        if summaries[name].get("status") == "stopped":
+            break
     return summaries, failures
 
 

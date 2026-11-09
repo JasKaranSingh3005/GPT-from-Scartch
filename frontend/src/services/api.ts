@@ -18,7 +18,12 @@ import type {
   ForwardPassResponse,
   JobLogs, 
   TrainingJob, 
-  TrainingJobRequest
+  TrainingJobRequest,
+  BatchDetail, 
+  BatchSummary, 
+  ExperimentCompareResponse, 
+  ExperimentList, 
+  ExperimentRunRequest
 } from "../types/api";
 
 export const API_BASE = (import.meta.env.VITE_API_URL ?? "http://localhost:8000/api/v1").replace(
@@ -97,4 +102,11 @@ export const api = {
   stopJob: (id: string) => request<TrainingJob>(`/training/jobs/${id}/stop`, post({})),
   resumeJob: (id: string, maxIters: number | null) =>request<TrainingJob>(`/training/jobs/${id}/resume`, post({ max_iters: maxIters })),
   jobLogs: (id: string) => request<JobLogs>(`/training/jobs/${id}/logs?tail=200`),
+  experiments: () => request<ExperimentList>("/experiments"),
+  experimentRuns: () => request<{ runs: BatchSummary[] }>("/experiments/runs"),
+  experimentRun: (id: string) => request<BatchDetail>(`/experiments/runs/${encodeURIComponent(id)}`),
+  runExperiments: (body: ExperimentRunRequest) =>request<TrainingJob>("/experiments/run", post(body)),
+  experimentCompare: (ids: string[]) =>request<ExperimentCompareResponse>(`/experiments/compare?${ids.map((i) => `run_ids=${encodeURIComponent(i)}`).join("&")}`,),
 };
+
+export const experimentCsvUrl = (id: string) =>`${API_BASE}/experiments/export/${encodeURIComponent(id)}`;

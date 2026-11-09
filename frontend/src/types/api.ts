@@ -250,6 +250,8 @@ export interface TrainingJob {
   latest: MetricRow | null;
   progress: number | null;
   result: Record<string, unknown> | null;
+  kind: string; 
+  detail: Record<string, unknown> | null;
 }
 
 export interface TrainingJobRequest {
@@ -272,4 +274,69 @@ export interface JobLogs {
   job_id: string;
   status: JobStatus;
   lines: string[];
+}
+
+export interface ExperimentVariantInfo {
+  name: string;
+  label: string;
+  model_type: string;
+  overrides: Record<string, unknown>;
+  model: Record<string, unknown>;
+}
+export interface ExperimentInfo {
+  key: string;
+  title: string;
+  variants: ExperimentVariantInfo[];
+}
+export interface ExperimentList {
+  base_model: Record<string, unknown>;
+  experiments: ExperimentInfo[];
+}
+export interface ExperimentRunRequest {
+  experiments: string[] | null;
+  max_iters: number;
+  seed: number;
+  force: boolean;
+}
+export interface BatchSummary {
+  batch_id: string;
+  max_iters: number;
+  seed: number;
+  variants_finished: number;
+  variants_total: number;
+  modified: string;
+}
+export interface BatchRow {
+  run: string;
+  label: string;
+  parameters: number;
+  training_time_s: number;
+  final_train_loss: number;
+  final_val_loss: number;
+  best_val_loss: number;
+  best_iter: number;
+  val_minus_train: number;
+}
+export interface CurvePoint {
+  iter: number;
+  train_loss: number;
+  val_loss: number;
+}
+export interface BatchDetail {
+  batch_id: string;
+  max_iters: number;
+  seed: number;
+  rows: BatchRow[];
+  curves: Record<string, CurvePoint[]>;
+  batch: Record<string, unknown> | null;
+}
+export interface ExperimentCompareVariant {
+  variant: string;
+  label: string;
+  best_val_loss: Record<string, number | null>;
+  parameters: Record<string, number | null>;
+}
+export interface ExperimentCompareResponse {
+  run_ids: string[];
+  variants: ExperimentCompareVariant[];
 }

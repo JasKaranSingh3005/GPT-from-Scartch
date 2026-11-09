@@ -9,6 +9,8 @@ from backend.services.jobs import (
     JobConflictError, JobNotFoundError, JobRejectedError, QueueFullError, TrainingDisabledError,
 )
 
+from backend.services.experiments import ExperimentNotFoundError
+
 
 def install_error_handlers(app: FastAPI) -> None:
     """Map registry exceptions to HTTP status codes with a {'detail': ...} body."""
@@ -28,3 +30,4 @@ def install_error_handlers(app: FastAPI) -> None:
     app.add_exception_handler(JobRejectedError, make(422))
     app.add_exception_handler(QueueFullError, make(429))
     app.add_exception_handler(TrainingDisabledError, make(403))
+    app.add_exception_handler(ExperimentNotFoundError, make(404))

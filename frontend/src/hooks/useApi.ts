@@ -126,6 +126,8 @@ function useJobMutation<V>(fn: (v: V) => Promise<TrainingJob>) {
       void qc.invalidateQueries({ queryKey: ["jobs"] });
       void qc.invalidateQueries({ queryKey: ["job"] });
       void qc.invalidateQueries({ queryKey: ["models"] });
+      void qc.invalidateQueries({ queryKey: ["exp-runs"] });
+      void qc.invalidateQueries({ queryKey: ["exp-run"] });
     },
   });
 }
@@ -133,3 +135,27 @@ function useJobMutation<V>(fn: (v: V) => Promise<TrainingJob>) {
 export const useCreateJob = () => useJobMutation(api.createJob);
 export const useStopJob = () => useJobMutation((id: string) => api.stopJob(id));
 export const useResumeJob = () =>useJobMutation(({ id, maxIters }: { id: string; maxIters: number | null }) =>api.resumeJob(id, maxIters));
+
+export const useExperimentDefs = () =>
+  useQuery({ queryKey: ["exp-defs"], queryFn: api.experiments, staleTime: Infinity });
+
+export const useExperimentRuns = (live: boolean) =>
+  useQuery({ queryKey: ["exp-runs"], queryFn: api.experimentRuns, refetchInterval: live ? 3000 : false });
+
+export const useExperimentRun = (id: string | null, live: boolean) =>
+  useQuery({
+    queryKey: ["exp-run", id],
+    queryFn: () => api.experimentRun(id as string),
+    enabled: id !== null,
+    refetchInterval: live ? 3000 : false,
+  });
+
+export const useExperimentCompare = (ids: string[]) =>
+  useQuery({
+    queryKey: ["exp-compare", ids],
+    queryFn: () => api.experimentCompare(ids),
+    enabled: ids.length >= 2 && ids.length <= 4,
+    retry: false,
+  });
+
+export const useRunExperiments = () => useJobMutation(api.runExperiments);

@@ -27,8 +27,8 @@ export const NAV_ITEMS: NavItem[] = [
   { path: "/attention", label: "Attention Visualizer", icon: Boxes, implemented: true },
   { path: "/tokenizer", label: "Tokenizer Explorer", icon: Type, implemented: true },
   { path: "/training", label: "Training Lab", icon: Activity, implemented: true },
-  { path: "/experiments", label: "Experiment Lab", icon: FlaskConical, implemented: false },
-  { path: "/compare", label: "Model Comparison", icon: GitCompare, implemented: false },
+  { path: "/experiments", label: "Experiment Lab", icon: FlaskConical, implemented: true },
+  { path: "/compare", label: "Model Comparison", icon: GitCompare, implemented: true },
   { path: "/learn", label: "Learning Center", icon: BookOpen, implemented: false },
   { path: "/settings", label: "Settings", icon: Settings, implemented: false },
 ];

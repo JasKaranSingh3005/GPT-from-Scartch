@@ -60,6 +60,8 @@ class TrainingJob(ApiModel):
     latest: MetricRow | None
     progress: float | None
     result: dict[str, Any] | None
+    kind: str = "training"
+    detail: dict[str, Any] | None = None
 
 
 class TrainingJobList(ApiModel):

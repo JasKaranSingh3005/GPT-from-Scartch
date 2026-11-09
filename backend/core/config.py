@@ -72,6 +72,10 @@ class Settings:
     @property
     def jobs_dir(self) -> Path:
         return self.data_dir / "jobs"
+    
+    @property
+    def experiments_dir(self) -> Path:
+        return self.data_dir / "experiments"
 
     @property
     def db_path(self) -> Path:

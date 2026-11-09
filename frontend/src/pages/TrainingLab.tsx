@@ -15,6 +15,7 @@ const ACTIVE: JobStatus[] = ["QUEUED", "RUNNING"];
 export function TrainingLab() {
   const jobs = useTrainingJobs();
   const [selected, setSelected] = useState<string | null>(null);
+  const trainingJobs = (jobs.data?.jobs ?? []).filter((x) => x.kind === "training");
 
   useEffect(() => {  // default to the newest job
     if (selected === null && jobs.data && jobs.data.jobs.length > 0) {
@@ -46,10 +47,10 @@ export function TrainingLab() {
 
       <Card title="Runs">
         {jobs.error && <ErrorState error={jobs.error} />}
-        {jobs.data && jobs.data.jobs.length === 0 && <EmptyState title="No training runs yet" />}
-        {jobs.data && jobs.data.jobs.length > 0 && (
+        {trainingJobs.length === 0 && <EmptyState title="No training runs yet" />}
+        {trainingJobs.length > 0 && (
           <ul className="divide-y divide-navy-600 text-sm">
-            {jobs.data.jobs.map((x) => (
+            {trainingJobs.map((x) => (
               <li key={x.job_id}>
                 <button onClick={() => setSelected(x.job_id)}
                   className={`flex w-full items-center justify-between gap-3 px-2 py-2 text-left ${x.job_id === selected ? "bg-violet/10" : "hover:bg-navy-700"}`}>

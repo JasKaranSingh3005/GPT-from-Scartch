@@ -21,6 +21,8 @@ from training.checkpoint import load_checkpoint
 from training.worker import config_from_dict
 from utils.config import Config, ModelConfig, TrainingConfig, load_config
 
+from experiments.definitions import selected_variants
+
 log = logging.getLogger("gptlab.jobs")
 
 QUEUED, RUNNING, COMPLETED, FAILED, STOPPED = "QUEUED", "RUNNING", "COMPLETED", "FAILED", "STOPPED"
@@ -401,6 +403,34 @@ class JobManager:
             cfg = self._build_config(params)
             return self._create(cfg, params["model_type"], name, resume=False, resumed_from=None)
 
+    def submit_experiment(self, params: dict[str, Any]) -> str:
+        """Queue an experiment batch: the existing run_all over the chosen experiments."""
+        self._require_training()
+        max_iters, seed = params["max_iters"], params["seed"]
+        self._check_iters(max_iters)
+        try:
+            selected_variants(params["experiments"])
+        except ValueError as exc:
+            raise JobRejectedError(str(exc)) from exc
+        batch_id = f"it{max_iters}_s{seed}"
+        run_name = f"exp-{batch_id}"
+        with self._lock:
+            if self.store.active_for_run(run_name):
+                raise JobConflictError(f"A batch {batch_id!r} is already queued or running")
+            self._check_queue()
+            base = load_config(self._s.config_path)
+            base = replace(
+                base, data=replace(base.data, path=str(self._abs(base.data.path))),
+                training=replace(base.training, seed=seed, max_iters=max_iters),
+            )
+            extra = {
+                "kind": "experiment", "batch_id": batch_id, "experiments": params["experiments"],
+                "max_iters": max_iters, "seed": seed, "force": bool(params.get("force", False)),
+                "out_root": str(self._s.experiments_dir),
+            }
+            return self._create(base, "experiment", run_name, resume=False, resumed_from=None,
+                                spec_extra=extra)
+    
     def resume(self, job_id: str, max_iters: int | None = None) -> str:
         """New job continuing the same run from its last.pt (optionally with a higher max_iters)."""
         self._require_training()
@@ -409,6 +439,10 @@ class JobManager:
             if row["status"] in (QUEUED, RUNNING):
                 raise JobConflictError(f"Job is still {row['status']}; stop it first")
             spec = json.loads(row["spec"])
+            if spec.get("kind") == "experiment":
+                raise JobRejectedError(
+                    "Experiment batches continue by submitting the same experiment again; "
+                    "finished variants are skipped")
             run_name = spec["run_name"]
             if self.store.active_for_run(run_name):
                 raise JobConflictError(f"A job for run {run_name!r} is already queued or running")
@@ -433,7 +467,7 @@ class JobManager:
             return self._create(cfg, spec["model_type"], run_name, resume=True, resumed_from=job_id)
 
     def _create(self, cfg: Config, model_type: str, run_name: str, *, resume: bool,
-                resumed_from: str | None) -> str:
+            resumed_from: str | None, spec_extra: dict[str, Any] | None = None) -> str:
         job_id = uuid.uuid4().hex[:12]
         job_dir = self.job_dir(job_id)
         job_dir.mkdir(parents=True)
@@ -442,6 +476,8 @@ class JobManager:
             "run_name": run_name, "out_root": str(self._s.runs_dir),
             "device": self._s.device, "resume": resume,
         }
+        if spec_extra:
+            spec.update(spec_extra)
         (job_dir / "spec.json").write_text(json.dumps(spec), encoding="utf-8")
         self.store.insert({
             "id": job_id, "run_name": run_name, "model_type": model_type, "status": QUEUED,
@@ -483,27 +519,34 @@ class JobManager:
     def _view(self, row: dict[str, Any]) -> dict[str, Any]:
         spec = json.loads(row["spec"])
         cfg = spec["config"]
+        kind = spec.get("kind", "training")
         metrics = read_jsonl(self.job_dir(row["id"]) / "metrics.jsonl")
         latest = {k: metrics[-1][k] for k in METRIC_KEYS} if metrics else None
         status = row["status"]
+        detail: dict[str, Any] | None = None
         if status == COMPLETED:
             progress: float | None = 1.0
         elif latest is not None:
             progress = min(1.0, latest["iter"] / cfg["training"]["max_iters"])
         else:
             progress = 0.0 if status == QUEUED else None
+        if kind == "experiment" and status != COMPLETED:
+            prog = read_json(self.job_dir(row["id"]) / "progress.json")
+            if prog and isinstance(prog.get("total"), int) and prog["total"] > 0:
+                detail = prog
+                progress = min(1.0, float(prog["done"]) / prog["total"])
         result = json.loads(row["result"]) if row["result"] else None
         if result is not None:
             result.pop("run_dir", None)  # don't expose server paths
         model = cfg["model"] if spec["model_type"] == "gpt" else {"block_size": cfg["model"]["block_size"]}
         return {
             "job_id": row["id"], "run_name": row["run_name"], "model_type": row["model_type"],
-            "model_id": f"{row['run_name']}:best", "status": status,
+            "model_id": f"{row['run_name']}:best", "status": status, "kind": kind,
             "created_at": row["created_at"], "started_at": row["started_at"],
             "finished_at": row["finished_at"], "config": {"model": model, "training": cfg["training"]},
             "error": row["error"], "resumed_from": row["resumed_from"],
             "stop_requested": bool(row["stop_requested"]), "latest": latest,
-            "progress": progress, "result": result, "device": spec["device"],
+            "progress": progress, "result": result, "device": spec["device"], "detail": detail,
         }
 
     def metrics(self, job_id: str, after_iter: int | None = None) -> list[dict[str, Any]]:

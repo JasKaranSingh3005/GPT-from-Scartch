@@ -8,6 +8,8 @@ import { AttentionVisualizer } from "../pages/AttentionVisualizer";
 import { TokenizerExplorer } from "../pages/TokenizerExplorer";
 import { ArchitectureExplorer } from "../pages/ArchitectureExplorer";
 import { TrainingLab } from "../pages/TrainingLab";
+import { ExperimentLab } from "../pages/ExperimentLab";
+import { ModelComparison } from "../pages/ModelComparison";
 
 export function App() {
   return (
@@ -19,6 +21,8 @@ export function App() {
         <Route path="attention" element={<AttentionVisualizer />} />
         <Route path="architecture" element={<ArchitectureExplorer />} />
         <Route path="training" element={<TrainingLab />} />
+        <Route path="experiments" element={<ExperimentLab />} />
+        <Route path="compare" element={<ModelComparison />} />
         {NAV_ITEMS.filter((item) => !item.implemented).map((item) => (
           <Route key={item.path} path={item.path} element={<UnderDevelopment title={item.label} />} />
         ))}
