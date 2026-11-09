@@ -1,5 +1,6 @@
 import type { Edge, Node } from "@xyflow/react";
 
+import { type ChartColors, chartTheme } from "../../theme/theme";
 import type { ArchitectureStage } from "../../types/api";
 import { formatInt } from "../../utils/format";
 
@@ -13,6 +14,7 @@ const SIDE_X = 300;
 export function buildFlow(
   stages: ArchitectureStage[],
   selectedKey: string | null,
+  colors: ChartColors = chartTheme("dark"),
 ): { nodes: Node[]; edges: Edge[] } {
   let row = -1;
   const nodes: Node[] = stages.map((s) => {
@@ -28,10 +30,10 @@ export function buildFlow(
         width: 250,
         whiteSpace: "pre-line",
         fontSize: 12,
-        color: "#e2e8f0",
-        background: selected ? "#2a1f5c" : "#111833",
-        border: `1px solid ${selected ? "#8b5cf6" : "#26325c"}`,
-        borderRadius: 8,
+        color: colors.text,
+        background: selected ? colors.selectedFill : colors.panel,
+        border: `1px solid ${selected ? colors.accent : colors.border}`,
+        borderRadius: 6,
       },
     };
   });

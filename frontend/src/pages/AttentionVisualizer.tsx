@@ -84,7 +84,7 @@ export function AttentionVisualizer() {
         </label>
         <textarea id="av-prompt" rows={3} maxLength={4000} className={FIELD} value={draft}
           onChange={(e) => setDraft(e.target.value)} />
-        <button className="mt-3 rounded bg-violet px-3 py-1.5 text-sm font-medium text-white hover:bg-violet-soft disabled:opacity-50"
+        <button className="mt-3 rounded bg-violet px-3 py-1.5 text-sm font-medium text-white hover:bg-violet-strong disabled:opacity-50"
           disabled={modelId === null || draft.length === 0}
           onClick={() => { setSubmitted(draft); setHover(null); }}>
           Visualize
@@ -104,7 +104,7 @@ export function AttentionVisualizer() {
           <Card title={`Layer ${data.layer}, ${headLabel}`}>
             <p className="mb-3 text-xs text-slate-500">
               Layer {data.layer} of {data.n_layers} | {data.n_heads} heads | {n} tokens | weights
-              rounded to 5 decimals, linear color scale from 0 to 1
+              rounded to 5 decimals, square-root color scale (small weights look brighter than they are; hover for exact values) 
             </p>
             <div className="overflow-x-auto">
               <Heatmap tokens={data.tokens} matrix={matrix} cell={mainCell(n)}

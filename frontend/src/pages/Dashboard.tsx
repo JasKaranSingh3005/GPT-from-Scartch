@@ -64,7 +64,7 @@ function ModelTable({ models }: { models: ModelSummary[] }) {
     <>
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
-          <thead className="text-xs uppercase text-slate-500">
+          <thead className="text-xs font-medium text-slate-500">
             <tr>
               <th className="py-2 pr-4 font-medium">Model</th>
               <th className="py-2 pr-4 font-medium">Size</th>
@@ -87,7 +87,7 @@ function ModelTable({ models }: { models: ModelSummary[] }) {
                   </button>
                   <button
                     disabled={busy}
-                    className="rounded bg-violet px-2 py-1 text-xs font-medium text-white hover:bg-violet-soft disabled:opacity-50"
+                    className="rounded bg-violet px-2 py-1 text-xs font-medium text-white hover:bg-violet-strong disabled:opacity-50"
                     onClick={() => (m.loaded ? unload.mutate(m.model_id) : load.mutate(m.model_id))}
                   >
                     {m.loaded ? "Unload" : "Load"}
@@ -168,8 +168,11 @@ function InspectedModel() {
 
 export function Dashboard() {
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-semibold text-slate-50">Dashboard</h1>
+    <div className="mx-auto max-w-[1500px] space-y-8">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-50">Dashboard</h1>
+        <p className="mt-1.5 max-w-xl text-sm text-slate-400">Check your runtime, inspect checkpoints and see how each model was trained.</p>
+      </div>
       <div className="grid gap-6 xl:grid-cols-2">
         <SystemCard />
         <CheckpointsCard />

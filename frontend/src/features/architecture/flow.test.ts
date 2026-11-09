@@ -1,6 +1,7 @@
 import type { ArchitectureStage } from "../../types/api";
 import { statsForStage } from "../../utils/architecture";
 import { buildFlow } from "./flow";
+import { chartTheme } from "../../theme/theme";
 
 const stage = (key: string, parameters = 0): ArchitectureStage => ({
   key, label: key, input_shape: "", output_shape: "", parameters, details: {},
@@ -28,10 +29,11 @@ test("the positional embedding sits beside the token embedding", () => {
 });
 
 test("only the selected node is highlighted and parameter counts appear in labels", () => {
+  const accent = chartTheme("dark").accent;
   const { nodes } = buildFlow(STAGES, "blocks");
   const border = (id: string) => String(nodes.find((n) => n.id === id)?.style?.border);
-  expect(border("blocks")).toContain("#8b5cf6");
-  expect(border("ln_f")).not.toContain("#8b5cf6");
+  expect(border("blocks")).toContain(accent);
+  expect(border("ln_f")).not.toContain(accent);
   expect(String(nodes.find((n) => n.id === "blocks")?.data.label)).toContain("100 parameters");
 });
 

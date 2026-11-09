@@ -8,11 +8,13 @@ import { useDebounced } from "../hooks/useDebounced";
 import { useModelChoice } from "../hooks/useModelChoice";
 import { charFrequencies, parseIds, tokensOutsideWindow } from "../utils/tokens";
 import { formatInt, visibleChar } from "../utils/format";
+import { useChartColors } from "../theme/useChartColors";
 
 const MAX_CHIPS = 500;
-const FIELD = "w-full rounded border border-navy-600 bg-navy-900 px-2 py-1.5 text-sm font-mono";
+const FIELD = "w-full rounded border border-field bg-navy-900 px-2 py-1.5 text-sm font-mono";
 
 export function TokenizerExplorer() {
+  const c = useChartColors();
   const { models, modelId, setModelId } = useModelChoice();
   const [text, setText] = useState("To be, or not to be");
   const debounced = useDebounced(text, 300);
@@ -83,7 +85,7 @@ export function TokenizerExplorer() {
               ["Context window", data.block_size === null ? "none" : formatInt(data.block_size)],
             ].map(([label, value]) => (
               <div key={label} className="rounded-lg border border-navy-600 bg-navy-800 p-4">
-                <div className="text-xs uppercase tracking-wide text-slate-400">{label}</div>
+                <div className="text-xs text-slate-400">{label}</div>
                 <div className="mt-1 font-mono text-xl text-slate-50">{value}</div>
               </div>
             ))}
@@ -124,14 +126,14 @@ export function TokenizerExplorer() {
             <div className="h-56 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={frequencies}>
-                  <XAxis dataKey="label" stroke="#94a3b8" />
-                  <YAxis allowDecimals={false} stroke="#94a3b8" />
+                  <XAxis dataKey="label" stroke={c.axis} />
+                  <YAxis allowDecimals={false} stroke={c.axis} />
                   <Tooltip
-                    cursor={{ fill: "rgba(139, 92, 246, 0.15)" }}
-                    contentStyle={{ background: "#111833", border: "1px solid #26325c" }}
-                    labelStyle={{ color: "#e2e8f0" }}
+                    cursor={{ fill: c.cursor }}
+                    contentStyle={c.tooltip}
+                    labelStyle={{ color: c.text }}
                   />
-                  <Bar dataKey="count" fill="#8b5cf6" />
+                  <Bar dataKey="count" fill={c.accent} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -151,7 +153,7 @@ export function TokenizerExplorer() {
           <label htmlFor="tk-ids" className="sr-only">Token IDs</label>
           <input id="tk-ids" className={`${FIELD} max-w-md`} placeholder="e.g. 30, 27, 25"
             value={idsText} onChange={(e) => setIdsText(e.target.value)} />
-          <button className="rounded bg-violet px-3 py-1.5 text-sm font-medium text-white hover:bg-violet-soft disabled:opacity-50"
+          <button className="rounded bg-violet px-3 py-1.5 text-sm font-medium text-white hover:bg-violet-strong disabled:opacity-50"
             disabled={modelId === null || decode.isPending} onClick={runDecode}>
             Decode
           </button>
@@ -175,7 +177,7 @@ export function TokenizerExplorer() {
                 <div key={e.id} className="rounded border border-navy-600 px-2 py-1">
                   <span className="text-violet-soft">{visibleChar(e.char)}</span>{" "}
                   <span className="text-slate-400">{e.id}</span>{" "}
-                  <span className="text-slate-600">{e.codepoint}</span>
+                  <span className="text-slate-500">{e.codepoint}</span>
                 </div>
               ))}
             </div>

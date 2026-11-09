@@ -15,7 +15,7 @@ interface VariantRow {
 }
 
 const LABELS = ["A", "B", "C", "D"];
-const FIELD = "rounded border border-navy-600 bg-navy-900 px-2 py-1 text-sm font-mono";
+const FIELD = "rounded border border-field bg-navy-900 px-2 py-1 text-sm font-mono";
 
 export function CompareView() {
   const settings = usePlaygroundStore((s) => s.settings);
@@ -102,7 +102,7 @@ export function CompareView() {
               onChange={(e) => setSeed(parseOptionalInt(e.target.value) ?? 0)} />
           </label>
           <button
-            className="rounded bg-violet px-3 py-1.5 font-medium text-white hover:bg-violet-soft disabled:opacity-50"
+            className="rounded bg-violet px-3 py-1.5 font-medium text-white hover:bg-violet-strong disabled:opacity-50"
             disabled={settings.modelId === null || compare.isPending || overLimit} onClick={run}>
             {compare.isPending ? "Running..." : "Run comparison"}
           </button>

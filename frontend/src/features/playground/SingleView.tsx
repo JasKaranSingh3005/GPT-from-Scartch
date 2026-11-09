@@ -58,7 +58,7 @@ export function SingleView() {
         <label htmlFor="pg-prompt" className="sr-only">Prompt</label>
         <textarea
           id="pg-prompt" rows={4}
-          className="w-full rounded border border-navy-600 bg-navy-900 p-2 font-mono text-sm"
+          className="w-full rounded border border-field bg-navy-900 p-2 font-mono text-sm"
           value={settings.prompt}
           onChange={(e) => update({ prompt: e.target.value })}
         />
@@ -67,7 +67,7 @@ export function SingleView() {
           starts from a newline.
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <button className={`${BTN} bg-violet font-medium text-white hover:bg-violet-soft`}
+          <button className={`${BTN} bg-violet font-medium text-white hover:bg-violet-strong`}
             disabled={!canRun} onClick={run}>
             Generate
           </button>

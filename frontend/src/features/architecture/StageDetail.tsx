@@ -43,7 +43,7 @@ export function StageDetail({ stage, architecture, stats }: StageDetailProps) {
         </p>
 
         <div>
-          <h3 className="mb-1 text-xs uppercase tracking-wide text-slate-400">
+          <h3 className="mb-1 text-xs font-medium text-slate-400">
             Measured on your prompt
           </h3>
           {stats === null && (

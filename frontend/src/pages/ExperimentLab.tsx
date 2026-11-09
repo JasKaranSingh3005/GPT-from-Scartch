@@ -12,12 +12,12 @@ import {
 import { experimentCsvUrl } from "../services/api";
 import { DASH, formatDuration, formatInt, formatLoss } from "../utils/format";
 import { mergeCurves, spread } from "../utils/experiments";
+import { useChartColors } from "../theme/useChartColors";
 
-const FIELD = "rounded border border-navy-600 bg-navy-900 px-2 py-1.5 text-sm font-mono";
-const COLORS = ["#8b5cf6", "#22d3ee", "#f59e0b", "#34d399", "#f87171", "#60a5fa"];
-const TIP = { background: "#111833", border: "1px solid #26325c" };
+const FIELD = "rounded border border-field bg-navy-900 px-2 py-1.5 text-sm font-mono";
 
 export function ExperimentLab() {
+  const c = useChartColors();
   const defs = useExperimentDefs();
   const jobs = useTrainingJobs();
   const activeJob = jobs.data?.jobs.find(
@@ -95,7 +95,7 @@ export function ExperimentLab() {
             Rerun finished variants
           </label>
           <button
-            className="rounded bg-violet px-3 py-1.5 font-medium text-white hover:bg-violet-soft disabled:opacity-50"
+            className="rounded bg-violet px-3 py-1.5 font-medium text-white hover:bg-violet-strong disabled:opacity-50"
             disabled={launch.isPending || live || maxIters < 1}
             onClick={() => launch.mutate(
               { experiments: picked.length ? picked : null, max_iters: maxIters, seed, force },
@@ -131,7 +131,7 @@ export function ExperimentLab() {
         )}
         {runs.data && runs.data.runs.length > 0 && (
           <table className="w-full text-left text-sm">
-            <thead className="text-xs uppercase text-slate-500">
+            <thead className="text-xs font-medium text-slate-500">
               <tr><th className="py-1">Compare</th><th>Batch</th><th>Iterations</th><th>Seed</th><th>Variants</th><th /></tr>
             </thead>
             <tbody className="divide-y divide-navy-600">
@@ -211,13 +211,13 @@ export function ExperimentLab() {
                 <div className="h-64" data-testid="curves">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={curveData}>
-                      <CartesianGrid stroke="#26325c" strokeDasharray="3 3" />
-                      <XAxis dataKey="iter" stroke="#94a3b8" />
-                      <YAxis stroke="#94a3b8" domain={["auto", "auto"]} />
-                      <Tooltip contentStyle={TIP} />
+                      <CartesianGrid stroke={c.grid} strokeDasharray="3 3" />
+                      <XAxis dataKey="iter" stroke={c.axis} />
+                      <YAxis stroke={c.axis} domain={["auto", "auto"]} />
+                      <Tooltip contentStyle={c.tooltip} />
                       <Legend />
                       {shown.map((r, i) => (
-                        <Line key={r.run} dataKey={r.run} stroke={COLORS[i % COLORS.length]}
+                        <Line key={r.run} dataKey={r.run} stroke={c.series[i % c.series.length]}
                           dot={false} isAnimationActive={false} />
                       ))}
                     </LineChart>
@@ -226,11 +226,11 @@ export function ExperimentLab() {
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={shown.map((r) => ({ name: r.run, best: r.best_val_loss }))}>
-                      <CartesianGrid stroke="#26325c" strokeDasharray="3 3" />
-                      <XAxis dataKey="name" stroke="#94a3b8" />
-                      <YAxis stroke="#94a3b8" domain={["auto", "auto"]} />
-                      <Tooltip contentStyle={TIP} cursor={{ fill: "rgba(139,92,246,0.15)" }} />
-                      <Bar dataKey="best" name="best validation loss" fill="#8b5cf6" />
+                      <CartesianGrid stroke={c.grid} strokeDasharray="3 3" />
+                      <XAxis dataKey="name" stroke={c.axis} />
+                      <YAxis stroke={c.axis} domain={["auto", "auto"]} />
+                      <Tooltip contentStyle={c.tooltip} cursor={{ fill: c.cursor }} />
+                      <Bar dataKey="best" name="best validation loss" fill={c.accent} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>

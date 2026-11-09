@@ -328,6 +328,20 @@ the two curves would cross.
 - Model size and training length were chosen for a CPU. Conclusions may not transfer to
   larger models.
 
+### Seed check (1000 iterations, seeds 1337 and 1)
+
+All 14 variants were rerun with seed 1. Best validation loss differed between the
+two seeds by 0.0003 to 0.0236 per variant (median about 0.006).
+
+- Held under both seeds, with the same ordering: bigram vs GPT, embedding dimension,
+  number of layers, context length (16 to 64 clearly; 128 was better under both seeds
+  but by a small margin), and dropout (0.0 best at this training length).
+- No detectable effect: number of attention heads. The spread across 1 to 8 heads
+  (0.018 to 0.027) is the same size as seed-to-seed variation of a single variant.
+- Differences below about 0.02 nats should not be trusted. Two seeds is not enough
+  for statistical significance, and the 5000-iteration dropout comparison was run with
+  one seed only.
+
 ## Hardware requirements
 
 - **CPU only:** enough for everything in this repository. On the machine used for the

@@ -9,7 +9,7 @@ import { useArchitecture, useForwardPass } from "../hooks/useApi";
 import { useModelChoice } from "../hooks/useModelChoice";
 import { formatInt } from "../utils/format";
 
-const FIELD = "w-full rounded border border-navy-600 bg-navy-900 px-2 py-1.5 text-sm font-mono";
+const FIELD = "w-full rounded border border-field bg-navy-900 px-2 py-1.5 text-sm font-mono";
 
 export function ArchitectureExplorer() {
   const { models, modelId, setModelId } = useModelChoice();
@@ -70,7 +70,7 @@ export function ArchitectureExplorer() {
               <input id="ae-prompt" className={`${FIELD} max-w-md`} value={prompt} maxLength={4000}
                 onChange={(e) => setPrompt(e.target.value)} />
               <button
-                className="rounded bg-violet px-3 py-1.5 text-sm font-medium text-white hover:bg-violet-soft disabled:opacity-50"
+                className="rounded bg-violet px-3 py-1.5 text-sm font-medium text-white hover:bg-violet-strong disabled:opacity-50"
                 disabled={modelId === null || prompt.length === 0 || forward.isPending}
                 onClick={() => modelId !== null && forward.mutate({ modelId, prompt })}>
                 {forward.isPending ? "Running..." : "Run forward pass"}
