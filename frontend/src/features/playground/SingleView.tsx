@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { Card } from "../../components/ui/Card";
+import { BUTTON_PRIMARY } from "../../components/ui/controls";
 import { ErrorState } from "../../components/ui/states";
 import { useGenerationStream } from "../../hooks/useGenerationStream";
 import { useSystemInfo } from "../../hooks/useApi";
@@ -67,7 +68,7 @@ export function SingleView() {
           starts from a newline.
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <button className={`${BTN} bg-violet font-medium text-white hover:bg-violet-strong`}
+          <button className={BUTTON_PRIMARY}
             disabled={!canRun} onClick={run}>
             Generate
           </button>

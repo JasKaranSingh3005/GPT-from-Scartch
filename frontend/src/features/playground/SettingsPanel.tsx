@@ -3,7 +3,9 @@ import { useModelDetail, useModels, useSystemInfo } from "../../hooks/useApi";
 import { usePlaygroundStore } from "../../stores/playgroundStore";
 import { useState } from "react";
 
-const FIELD = "w-full rounded border border-navy-600 bg-navy-900 px-2 py-1.5 text-sm font-mono";
+import { FIELD_BASE } from "../../components/ui/controls";
+
+const FIELD = `${FIELD_BASE} w-full`;
 
 export function parseOptionalInt(value: string): number | null {
   const n = parseInt(value, 10);

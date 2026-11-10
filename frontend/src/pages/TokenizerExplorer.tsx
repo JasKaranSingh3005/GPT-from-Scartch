@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { Card } from "../components/ui/Card";
+import { BUTTON_PRIMARY, FIELD_BASE } from "../components/ui/controls";
 import { EmptyState, ErrorState } from "../components/ui/states";
 import { useDecode, useEncode, useVocabulary } from "../hooks/useApi";
 import { useDebounced } from "../hooks/useDebounced";
@@ -11,7 +12,7 @@ import { formatInt, visibleChar } from "../utils/format";
 import { useChartColors } from "../theme/useChartColors";
 
 const MAX_CHIPS = 500;
-const FIELD = "w-full rounded border border-field bg-navy-900 px-2 py-1.5 text-sm font-mono";
+const FIELD = `${FIELD_BASE} w-full`;
 
 export function TokenizerExplorer() {
   const c = useChartColors();
@@ -153,7 +154,7 @@ export function TokenizerExplorer() {
           <label htmlFor="tk-ids" className="sr-only">Token IDs</label>
           <input id="tk-ids" className={`${FIELD} max-w-md`} placeholder="e.g. 30, 27, 25"
             value={idsText} onChange={(e) => setIdsText(e.target.value)} />
-          <button className="rounded bg-violet px-3 py-1.5 text-sm font-medium text-white hover:bg-violet-strong disabled:opacity-50"
+          <button className={BUTTON_PRIMARY}
             disabled={modelId === null || decode.isPending} onClick={runDecode}>
             Decode
           </button>

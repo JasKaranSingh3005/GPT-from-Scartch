@@ -8,9 +8,10 @@ import { useAttention } from "../hooks/useApi";
 import { useModelChoice } from "../hooks/useModelChoice";
 import { visibleChar } from "../utils/format";
 import { averageHeads } from "../utils/tokens";
+import { BUTTON_PRIMARY, FIELD_BASE } from "../components/ui/controls";
 
 const DEFAULT_PROMPT = "ROMEO:\nBut soft, what";
-const FIELD = "w-full rounded border border-navy-600 bg-navy-900 px-2 py-1.5 text-sm font-mono";
+const FIELD = `${FIELD_BASE} w-full`;
 
 const mainCell = (n: number) => (n <= 16 ? 28 : n <= 32 ? 16 : n <= 48 ? 11 : 8);
 const smallCell = (n: number) => (n <= 16 ? 12 : n <= 32 ? 7 : 4);
@@ -84,7 +85,7 @@ export function AttentionVisualizer() {
         </label>
         <textarea id="av-prompt" rows={3} maxLength={4000} className={FIELD} value={draft}
           onChange={(e) => setDraft(e.target.value)} />
-        <button className="mt-3 rounded bg-violet px-3 py-1.5 text-sm font-medium text-white hover:bg-violet-strong disabled:opacity-50"
+        <button className={`mt-3 ${BUTTON_PRIMARY}`}
           disabled={modelId === null || draft.length === 0}
           onClick={() => { setSubmitted(draft); setHover(null); }}>
           Visualize
