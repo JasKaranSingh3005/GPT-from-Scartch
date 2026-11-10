@@ -1,0 +1,29 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      GPTLAB_DATA_DIR: /data
+      GPTLAB_DEVICE: ${GPTLAB_DEVICE:-cpu}
+      GPTLAB_CORS_ORIGINS: ${GPTLAB_CORS_ORIGINS:-http://localhost:8080,http://127.0.0.1:8080}
+      GPTLAB_TRAINING_ENABLED: ${GPTLAB_TRAINING_ENABLED:-true}
+      GPTLAB_MAX_NEW_TOKENS: ${GPTLAB_MAX_NEW_TOKENS:-1000}
+      GPTLAB_MAX_LOADED: ${GPTLAB_MAX_LOADED:-3}
+    volumes:
+      - ${GPTLAB_DATA_HOST:-./outputs}:/data
+    ports:
+      - "8000:8000"
+    stop_grace_period: 40s   # a running training worker gets up to 20 s to stop cleanly
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000/api/v1}
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped

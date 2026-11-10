@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: gptlab-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: GPTLAB_DEVICE
+        value: cpu
+      - key: GPTLAB_TRAINING_ENABLED
+        value: "false"
+      - key: GPTLAB_MAX_NEW_TOKENS
+        value: "300"
+      - key: GPTLAB_MAX_LOADED
+        value: "1"
+      - key: GPTLAB_CORS_ORIGINS
+        sync: false

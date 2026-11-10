@@ -1,0 +1,28 @@
+{
+  "run_name": "gpt_small",
+  "model_type": "gpt",
+  "device": "cpu",
+  "parameters": 211777,
+  "vocab_size": 65,
+  "model_kwargs": {
+    "vocab_size": 65,
+    "n_embd": 64,
+    "n_head": 4,
+    "n_layer": 4,
+    "block_size": 64,
+    "dropout": 0.1
+  },
+  "training": {
+    "batch_size": 32,
+    "learning_rate": 0.001,
+    "max_iters": 3000,
+    "seed": 1337,
+    "block_size": 64
+  },
+  "training_time_s": 649.4799797999985,
+  "final_train_loss": 1.6553030014038086,
+  "final_val_loss": 1.8232449293136597,
+  "best_val_loss": 1.8232449293136597,
+  "best_iter": 3000,
+  "run_dir": "outputs\\runs\\gpt_small"
+}
