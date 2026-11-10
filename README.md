@@ -1,10 +1,9 @@
-# GPT Lab
+# Nanoscope
 
 An interactive full-stack lab around a **GPT language model written from scratch in PyTorch**
 (no pretrained weights, no Hugging Face). Train it, generate text with it, look inside it,
 and run controlled experiments on it.
 
-![Dashboard](docs/images/screenshots/dashboard.png)
 
 ## What it does
 
@@ -24,7 +23,6 @@ Nothing in the UI is simulated. Every number comes from the backend, which reads
 `summary.json` files, or a live PyTorch call. If something isn't available, the page says so.
 The Learning Center page is not built yet and shows an "under development" state.
 
-![Attention](docs/images/screenshots/attention.png)
 
 ## Architecture
 
@@ -55,7 +53,7 @@ default configuration has 211,777 parameters (n_embd 64, 4 heads, 4 layers, cont
 Requirements: Python 3.11+ and Node 18+ (developed on Python 3.14 and Node 22).
 
 ```bash
-git clone <your-repo-url> gpt-lab && cd gpt-lab
+git clone https://github.com/JasKaranSingh3005/Nanoscope nanoscope && cd nanoscope
 python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -r backend/requirements.txt
 python -m utils.data                                  # download the dataset

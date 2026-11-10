@@ -33,7 +33,7 @@ def create_app(
         registry.unload_all()
 
     app = FastAPI(
-        title="GPT Lab API",
+        title="Nanoscope API",
         version=__version__,
         description="HTTP API over the from-scratch PyTorch GPT in this repository.",
         lifespan=lifespan,
