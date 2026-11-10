@@ -75,28 +75,60 @@ function ModelTable({ models }: { models: ModelSummary[] }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-navy-600">
-            {models.map((m) => (
-              <tr key={m.model_id} className={clsx("transition-colors hover:bg-navy-700/50", m.model_id === selected && "bg-violet/10")}>
-                <td className="py-2 pr-4 font-mono">{m.model_id}</td>
-                <td className="py-2 pr-4 text-slate-400">{formatBytes(m.size_bytes)}</td>
-                <td className="py-2 pr-4">{m.loaded ? "Loaded" : "Not loaded"}</td>
-                <td className="space-x-2 py-2 text-right">
-                  <button
-                    className="rounded-md border border-navy-600 px-2.5 py-1 text-xs font-medium text-slate-200 transition-colors hover:bg-navy-700 focus-visible:outline-none"
-                    onClick={() => select(m.model_id)}
-                  >
-                    Inspect
-                  </button>
-                  <button
-                    disabled={busy}
-                    className="rounded-md bg-violet px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-violet-strong disabled:cursor-not-allowed disabled:opacity-50"
-                    onClick={() => (m.loaded ? unload.mutate(m.model_id) : load.mutate(m.model_id))}
-                  >
-                    {m.loaded ? "Unload" : "Load"}
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {models.map((m) => {
+              const isSelected = m.model_id === selected;
+              return (
+                <tr key={m.model_id} className={clsx("transition-colors hover:bg-navy-700/50", isSelected && "bg-violet/10")}>
+                  <td className="py-2 pr-4 font-mono">{m.model_id}</td>
+                  <td className="py-2 pr-4 text-slate-400">{formatBytes(m.size_bytes)}</td>
+                  <td className="py-2 pr-4">
+                    <span className="inline-flex items-center gap-2">
+                      <span
+                        aria-hidden
+                        className={clsx("h-2 w-2 rounded-full", m.loaded ? "bg-emerald-400" : "bg-slate-600")}
+                      />
+                      <span className={m.loaded ? "text-slate-100" : "text-slate-400"}>
+                        {m.loaded ? "Loaded" : "Not loaded"}
+                      </span>
+                    </span>
+                  </td>
+                  <td className="space-x-2 py-2 text-right whitespace-nowrap">
+                    <button
+                      type="button"
+                      aria-pressed={isSelected}
+                      className={clsx(
+                        "rounded-md border px-2.5 py-1 text-xs font-medium transition-colors focus-visible:outline-none",
+                        isSelected
+                          ? "border-violet-soft text-violet-soft"
+                          : "border-navy-600 text-slate-200 hover:bg-navy-700",
+                      )}
+                      onClick={() => select(m.model_id)}
+                    >
+                      {isSelected ? "Inspecting" : "Inspect"}
+                    </button>
+                    {m.loaded ? (
+                      <button
+                        type="button"
+                        disabled={busy}
+                        className="rounded-md border border-navy-600 px-2.5 py-1 text-xs font-medium text-slate-200 transition-colors hover:bg-navy-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        onClick={() => unload.mutate(m.model_id)}
+                      >
+                        Unload
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={busy}
+                        className="rounded-md bg-violet px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-violet-strong disabled:cursor-not-allowed disabled:opacity-50"
+                        onClick={() => load.mutate(m.model_id)}
+                      >
+                        Load
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
