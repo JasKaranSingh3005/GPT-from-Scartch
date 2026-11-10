@@ -7,35 +7,35 @@ export type Tokens = Record<string, string>;
 /**
  * THE PALETTE. Values are space-separated "R G B" so Tailwind can add opacity
  * (bg-violet/15). Legacy Tailwind names map onto these tokens (see tailwind.config.ts):
- *   navy-*  = surface scale   slate-* = text scale   violet = accent (caramel)   cyan = secondary (cream / cocoa)
+ *   navy-*  = surface scale   slate-* = text scale   violet = accent (blue)   cyan = secondary (neutral gray)
  */
 export const DARK: Tokens = {
-  "surface-950": "24 15 6", "surface-900": "33 21 9", "surface-800": "56 36 13",
-  "surface-700": "78 52 22", "surface-600": "104 72 38", "field-border": "142 122 90",
-  "fg-50": "253 251 212", "fg-100": "245 240 204", "fg-200": "232 224 190",
-  "fg-300": "208 196 160", "fg-400": "186 172 138", "fg-500": "168 152 118", "fg-600": "112 96 68",
-  accent: "192 88 0", "accent-soft": "238 158 84", "accent-strong": "158 74 0",
-  secondary: "253 251 212",
-  success: "140 200 110", warning: "246 200 60", danger: "239 83 80", "danger-fg": "254 202 202",
-  "heat-from": "78 52 22", "heat-to": "238 158 84", "heat-masked": "33 21 9",
+  "surface-950": "10 10 11", "surface-900": "18 18 20", "surface-800": "26 26 29",
+  "surface-700": "39 39 43", "surface-600": "63 63 70", "field-border": "113 113 122",
+  "fg-50": "250 250 250", "fg-100": "244 244 245", "fg-200": "228 228 231",
+  "fg-300": "212 212 216", "fg-400": "161 161 170", "fg-500": "143 143 153", "fg-600": "113 113 122",
+  accent: "37 99 235", "accent-soft": "96 165 250", "accent-strong": "29 78 216",
+  secondary: "228 228 231",
+  success: "74 222 128", warning: "250 204 21", danger: "248 113 113", "danger-fg": "254 202 202",
+  "heat-from": "39 39 43", "heat-to": "96 165 250", "heat-masked": "18 18 20",
 };
 
 export const LIGHT: Tokens = {
-  "surface-950": "244 238 190", "surface-900": "253 251 212", "surface-800": "255 254 244",
-  "surface-700": "250 246 214", "surface-600": "222 212 160", "field-border": "150 128 90",
-  "fg-50": "42 27 9", "fg-100": "56 36 13", "fg-200": "74 50 22",
-  "fg-300": "96 68 34", "fg-400": "117 88 52", "fg-500": "128 98 60", "fg-600": "166 142 100",
-  accent: "192 88 0", "accent-soft": "154 72 0", "accent-strong": "113 54 0",
-  secondary: "113 54 0",
-  success: "63 115 30", warning: "138 102 0", danger: "200 40 40", "danger-fg": "140 25 25",
-  "heat-from": "247 242 200", "heat-to": "150 70 0", "heat-masked": "253 251 212",
+  "surface-950": "244 244 245", "surface-900": "250 250 250", "surface-800": "255 255 255",
+  "surface-700": "244 244 245", "surface-600": "212 212 216", "field-border": "113 113 122",
+  "fg-50": "24 24 27", "fg-100": "39 39 42", "fg-200": "63 63 70",
+  "fg-300": "82 82 91", "fg-400": "113 113 122", "fg-500": "107 107 116", "fg-600": "161 161 170",
+  accent: "37 99 235", "accent-soft": "37 99 235", "accent-strong": "29 78 216",
+  secondary: "63 63 70",
+  success: "21 128 61", warning: "161 98 7", danger: "220 38 38", "danger-fg": "153 27 27",
+  "heat-from": "244 244 245", "heat-to": "37 99 235", "heat-masked": "250 250 250",
 };
 
 export const TOKENS: Record<Theme, Tokens> = { dark: DARK, light: LIGHT };
 
 const SERIES: Record<Theme, string[]> = {
-  dark: ["#EE9E54", "#FDFBD4", "#D96C5A", "#9DBB6A", "#C99BD8", "#6FB7C9"],
-  light: ["#C05800", "#713600", "#B83A4B", "#4D7C0F", "#7E4AA8", "#1F7A8C"],
+  dark: ["#60A5FA", "#E4E4E7", "#A1A1AA", "#4ADE80", "#FACC15", "#F87171"],
+  light: ["#2563EB", "#27272A", "#71717A", "#15803D", "#A16207", "#DC2626"],
 };
 
 const STORAGE_KEY = "gptlab-theme";

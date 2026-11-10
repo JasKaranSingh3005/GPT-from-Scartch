@@ -4,8 +4,9 @@ import { Card } from "../components/ui/Card";
 import { ErrorState } from "../components/ui/states";
 import { useCompare, useModelConfig, useModelDetail, useModels } from "../hooks/useApi";
 import { DASH, formatDuration, formatInt, formatLoss } from "../utils/format";
+import { BUTTON_PRIMARY, FIELD_BASE } from "../components/ui/controls";
 
-const FIELD = "rounded border border-field bg-navy-900 px-2 py-1.5 text-sm font-mono";
+const FIELD = FIELD_BASE;
 
 function FactsRow({ id, speed }: { id: string; speed: number | undefined }) {
   const detail = useModelDetail(id);
@@ -104,7 +105,7 @@ export function ModelComparison() {
           </label>
         </div>
         <button
-          className="mt-3 rounded bg-violet px-3 py-1.5 text-sm font-medium text-white hover:bg-violet-strong disabled:opacity-50"
+          className={`mt-3 ${BUTTON_PRIMARY}`}
           disabled={ids.length < 2 || compare.isPending} onClick={run}>
           {compare.isPending ? "Generating..." : "Compare"}
         </button>

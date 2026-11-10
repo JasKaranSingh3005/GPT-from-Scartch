@@ -13,8 +13,9 @@ import { experimentCsvUrl } from "../services/api";
 import { DASH, formatDuration, formatInt, formatLoss } from "../utils/format";
 import { mergeCurves, spread } from "../utils/experiments";
 import { useChartColors } from "../theme/useChartColors";
+import { BUTTON_PRIMARY, FIELD_BASE } from "../components/ui/controls";
 
-const FIELD = "rounded border border-field bg-navy-900 px-2 py-1.5 text-sm font-mono";
+const FIELD = FIELD_BASE;
 
 export function ExperimentLab() {
   const c = useChartColors();
@@ -95,7 +96,7 @@ export function ExperimentLab() {
             Rerun finished variants
           </label>
           <button
-            className="rounded bg-violet px-3 py-1.5 font-medium text-white hover:bg-violet-strong disabled:opacity-50"
+            className={BUTTON_PRIMARY}
             disabled={launch.isPending || live || maxIters < 1}
             onClick={() => launch.mutate(
               { experiments: picked.length ? picked : null, max_iters: maxIters, seed, force },

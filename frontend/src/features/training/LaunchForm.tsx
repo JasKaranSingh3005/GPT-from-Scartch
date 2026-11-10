@@ -1,11 +1,12 @@
 import { useState } from "react";
 
+import { BUTTON_PRIMARY, FIELD_BASE } from "../../components/ui/controls";
 import { Card } from "../../components/ui/Card";
 import { ErrorState } from "../../components/ui/states";
 import { useCreateJob } from "../../hooks/useApi";
 import type { TrainingJobRequest } from "../../types/api";
 
-const FIELD = "w-full rounded border border-field bg-navy-900 px-2 py-1.5 text-sm font-mono";
+const FIELD = `${FIELD_BASE} w-full`;
 
 const DEFAULTS: TrainingJobRequest = {
   name: "", model_type: "gpt", n_embd: 64, n_head: 4, n_layer: 4, block_size: 64, dropout: 0.1,
@@ -72,7 +73,7 @@ export function LaunchForm({ onCreated }: { onCreated: (jobId: string) => void }
       {problem && form.name !== "" && <p role="alert" className="mt-2 text-xs text-amber-300">{problem}</p>}
       {create.error && <div className="mt-2"><ErrorState error={create.error} /></div>}
       <button
-        className="mt-3 rounded bg-violet px-3 py-1.5 text-sm font-medium text-white hover:bg-violet-strong disabled:opacity-50"
+        className={`mt-3 ${BUTTON_PRIMARY}`}
         disabled={problem !== null || create.isPending}
         onClick={() => create.mutate(form, { onSuccess: (job) => onCreated(job.job_id) })}>
         {create.isPending ? "Queuing..." : "Start training"}

@@ -10,7 +10,7 @@ export default {
     extend: {
       colors: {
         // Legacy names kept so components need no edits. The names no longer describe the colors:
-        // violet is the caramel accent, cyan is the secondary (cream in dark, cocoa in light). Values live in theme.ts.
+        // violet is the accent (blue), cyan is the secondary (neutral gray). Values live in theme.ts.
         navy: { 950: v("surface-950"), 900: v("surface-900"), 800: v("surface-800"), 700: v("surface-700"), 600: v("surface-600") },
         slate: { 50: v("fg-50"), 100: v("fg-100"), 200: v("fg-200"), 300: v("fg-300"), 400: v("fg-400"), 500: v("fg-500"), 600: v("fg-600") },
         // Form-field outlines: 3:1 against both the panel and the field background (WCAG 1.4.11).

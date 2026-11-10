@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { Card } from "../../components/ui/Card";
+import { BUTTON_PRIMARY, BUTTON_SECONDARY, FIELD_BASE } from "../../components/ui/controls";
 import { ErrorState } from "../../components/ui/states";
 import { useCompare, useModels, useSystemInfo } from "../../hooks/useApi";
 import { usePlaygroundStore } from "../../stores/playgroundStore";
@@ -15,7 +16,7 @@ interface VariantRow {
 }
 
 const LABELS = ["A", "B", "C", "D"];
-const FIELD = "rounded border border-field bg-navy-900 px-2 py-1 text-sm font-mono";
+const FIELD = FIELD_BASE;
 
 export function CompareView() {
   const settings = usePlaygroundStore((s) => s.settings);
@@ -88,7 +89,7 @@ export function CompareView() {
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
           {rows.length < 4 && (
-            <button className="rounded border border-navy-600 px-2 py-1 hover:bg-navy-700"
+            <button className={BUTTON_SECONDARY}
               onClick={() => setRows((rs) => [...rs, {
                 label: LABELS.find((l) => !rs.some((r) => r.label === l)) ?? "X",
                 modelId: "", temperature: "", topK: "",
@@ -102,7 +103,7 @@ export function CompareView() {
               onChange={(e) => setSeed(parseOptionalInt(e.target.value) ?? 0)} />
           </label>
           <button
-            className="rounded bg-violet px-3 py-1.5 font-medium text-white hover:bg-violet-strong disabled:opacity-50"
+            className={BUTTON_PRIMARY}
             disabled={settings.modelId === null || compare.isPending || overLimit} onClick={run}>
             {compare.isPending ? "Running..." : "Run comparison"}
           </button>
