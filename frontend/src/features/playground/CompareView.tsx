@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { Card } from "../../components/ui/Card";
-import { BUTTON_PRIMARY, FIELD_BASE } from "../../components/ui/controls";
+import { BUTTON_PRIMARY, BUTTON_SECONDARY, FIELD_BASE } from "../../components/ui/controls";
 import { ErrorState } from "../../components/ui/states";
 import { useCompare, useModels, useSystemInfo } from "../../hooks/useApi";
 import { usePlaygroundStore } from "../../stores/playgroundStore";
@@ -89,7 +89,7 @@ export function CompareView() {
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
           {rows.length < 4 && (
-            <button className="rounded border border-navy-600 px-2 py-1 hover:bg-navy-700"
+            <button className={BUTTON_SECONDARY}
               onClick={() => setRows((rs) => [...rs, {
                 label: LABELS.find((l) => !rs.some((r) => r.label === l)) ?? "X",
                 modelId: "", temperature: "", topK: "",

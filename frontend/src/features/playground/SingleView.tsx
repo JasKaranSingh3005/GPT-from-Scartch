@@ -1,15 +1,12 @@
 import { useState } from "react";
 
 import { Card } from "../../components/ui/Card";
-import { BUTTON_PRIMARY } from "../../components/ui/controls";
+import { BUTTON_PRIMARY, BUTTON_SECONDARY } from "../../components/ui/controls";
 import { ErrorState } from "../../components/ui/states";
 import { useGenerationStream } from "../../hooks/useGenerationStream";
 import { useSystemInfo } from "../../hooks/useApi";
 import { usePlaygroundStore } from "../../stores/playgroundStore";
 import { OutputView } from "./OutputView";
-
-const BTN = "rounded px-3 py-1.5 text-sm disabled:opacity-50";
-
 export function SingleView() {
   const settings = usePlaygroundStore((s) => s.settings);
   const update = usePlaygroundStore((s) => s.update);
@@ -72,11 +69,11 @@ export function SingleView() {
             disabled={!canRun} onClick={run}>
             Generate
           </button>
-          <button className={`${BTN} border border-navy-600 hover:bg-navy-700`}
+          <button className={BUTTON_SECONDARY}
             disabled={!streaming} onClick={stop}>
             Stop
           </button>
-          <button className={`${BTN} border border-navy-600 hover:bg-navy-700`}
+          <button className={BUTTON_SECONDARY}
             disabled={!canRun || !hasOutput} onClick={run}>
             Regenerate
           </button>
