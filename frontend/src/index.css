@@ -22,6 +22,21 @@ body {
   @apply outline-none ring-2 ring-violet-soft ring-offset-2 ring-offset-navy-900;
 }
 
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.page-enter {
+  animation: page-enter 280ms ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

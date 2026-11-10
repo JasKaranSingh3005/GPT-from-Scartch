@@ -1,3 +1,5 @@
+import clsx from "clsx";
+
 import { Card } from "../components/ui/Card";
 import { MetricCard } from "../components/ui/MetricCard";
 import { Skeleton } from "../components/ui/Skeleton";
@@ -74,20 +76,20 @@ function ModelTable({ models }: { models: ModelSummary[] }) {
           </thead>
           <tbody className="divide-y divide-navy-600">
             {models.map((m) => (
-              <tr key={m.model_id} className={m.model_id === selected ? "bg-violet/10" : undefined}>
+              <tr key={m.model_id} className={clsx("transition-colors hover:bg-navy-700/50", m.model_id === selected && "bg-violet/10")}>
                 <td className="py-2 pr-4 font-mono">{m.model_id}</td>
                 <td className="py-2 pr-4 text-slate-400">{formatBytes(m.size_bytes)}</td>
                 <td className="py-2 pr-4">{m.loaded ? "Loaded" : "Not loaded"}</td>
                 <td className="space-x-2 py-2 text-right">
                   <button
-                    className="rounded border border-navy-600 px-2 py-1 text-xs hover:bg-navy-700"
+                    className="rounded-md border border-navy-600 px-2.5 py-1 text-xs font-medium text-slate-200 transition-colors hover:bg-navy-700 focus-visible:outline-none"
                     onClick={() => select(m.model_id)}
                   >
                     Inspect
                   </button>
                   <button
                     disabled={busy}
-                    className="rounded bg-violet px-2 py-1 text-xs font-medium text-white hover:bg-violet-strong disabled:opacity-50"
+                    className="rounded-md bg-violet px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-violet-strong disabled:cursor-not-allowed disabled:opacity-50"
                     onClick={() => (m.loaded ? unload.mutate(m.model_id) : load.mutate(m.model_id))}
                   >
                     {m.loaded ? "Unload" : "Load"}

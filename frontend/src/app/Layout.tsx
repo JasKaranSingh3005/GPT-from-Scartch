@@ -35,6 +35,7 @@ export function Layout() {
   const collapsed = useUiStore((s) => s.collapsed);
   const toggleSidebar = useUiStore((s) => s.toggleSidebar);
   const current = useCurrentItem();
+  const { pathname } = useLocation();
   // The mobile drawer is always shown in full; the icon rail only applies on large screens.
   const showLabels = !collapsed || mobileOpen;
   const CurrentIcon = current?.icon;
@@ -139,7 +140,7 @@ export function Layout() {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 shrink-0 items-center gap-3 border-b border-navy-600 px-4 sm:px-6">
+        <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center gap-3 border-b border-navy-600 bg-navy-900/85 px-4 backdrop-blur supports-[backdrop-filter]:bg-navy-900/70 sm:px-6">
           <button
             type="button"
             className="rounded-md p-2 text-slate-400 hover:bg-navy-800 hover:text-slate-100 lg:hidden"
@@ -159,8 +160,10 @@ export function Layout() {
             <ThemeToggle />
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6">
-          <Outlet />
+        <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-8 sm:py-8">
+          <div key={pathname} className="page-enter">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>
