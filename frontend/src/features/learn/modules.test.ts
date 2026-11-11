@@ -27,3 +27,8 @@ test("every demo key is known and backend demos are a subset", () => {
   for (const m of MODULES) if (m.demo) expect(DEMO_KEYS).toContain(m.demo);
   for (const d of BACKEND_DEMOS) expect(DEMO_KEYS).toContain(d);
 });
+
+test("all twelve modules are written, and a focus is only used with the shapes demo", () => {
+  expect(MODULES.every((m) => m.written)).toBe(true);
+  for (const m of MODULES) if (m.focus) expect(m.demo, m.id).toBe("shapes");
+});

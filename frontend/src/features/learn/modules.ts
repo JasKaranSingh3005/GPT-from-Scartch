@@ -1,7 +1,14 @@
-export type DemoKey = "tokenizer" | "causal-mask" | "attention" | "temperature";
-export const DEMO_KEYS: DemoKey[] = ["tokenizer", "causal-mask", "attention", "temperature"];
+export type DemoKey =
+  | "tokenizer" | "causal-mask" | "attention" | "temperature"
+  | "shapes" | "heads" | "ffn" | "layernorm" | "shift";
+export const DEMO_KEYS: DemoKey[] = [
+  "tokenizer", "causal-mask", "attention", "temperature",
+  "shapes", "heads", "ffn", "layernorm", "shift",
+];
 /** Demos that call the backend and therefore need a model chosen. */
-export const BACKEND_DEMOS: DemoKey[] = ["tokenizer", "attention", "temperature"];
+export const BACKEND_DEMOS: DemoKey[] = [
+  "tokenizer", "attention", "temperature", "shapes", "heads", "ffn",
+];
 
 export interface LearnModule {
   id: string;
@@ -12,11 +19,9 @@ export interface LearnModule {
   sections: { heading: string; paragraphs: string[] }[];
   equations: { label: string; text: string }[];
   demo?: DemoKey;
+  /** For the "shapes" demo: which forward-pass modules to show (a trailing "." matches a prefix). */
+  focus?: string[];
 }
-
-const todo = (id: string, title: string, summary: string): LearnModule => ({
-  id, title, summary, written: false, sections: [], equations: [],
-});
 
 export const MODULES: LearnModule[] = [
   {
@@ -65,8 +70,57 @@ export const MODULES: LearnModule[] = [
     ],
     equations: [{ label: "Encoding", text: "id[t] = sorted_vocabulary.index(char[t])" }],
   },
-  todo("embeddings", "Embeddings", "How token IDs become vectors."),
-  todo("positional-encoding", "Positional encoding", "How the model knows the order of tokens."),
+  {
+    id: "embeddings",
+    title: "Embeddings",
+    summary: "How token IDs become vectors.",
+    written: true,
+    demo: "shapes",
+    focus: ["token_embedding"],
+    sections: [
+      {
+        heading: "A lookup table",
+        paragraphs: [
+          "A token ID is just a label, so the first layer replaces it with a vector. The token embedding is a table with one row per vocabulary entry and n_embd columns. Looking up a token means reading its row. For the default model that is 65 rows of 64 numbers, 4,160 parameters.",
+          "The rows start as small random numbers (a normal distribution with standard deviation 0.02) and are learned during training like every other weight. Nothing about them is meaningful at the start, and whatever structure they end up with comes from the next-character objective.",
+          "The vector for each position is what flows through the rest of the network, so n_embd is the width of the whole model.",
+        ],
+      },
+      {
+        heading: "The demo",
+        paragraphs: [
+          "Run a forward pass of the selected checkpoint on a prompt. The table shows the real output shape and statistics of the token embedding: a batch of 1, one vector per character, and n_embd numbers per vector.",
+        ],
+      },
+    ],
+    equations: [{ label: "Token embedding", text: "x_tok[t] = E_tok[id[t]]    (E_tok has shape vocab_size x n_embd)" }],
+  },
+  {
+    id: "positional-encoding",
+    title: "Positional encoding",
+    summary: "How the model knows the order of tokens.",
+    written: true,
+    demo: "shapes",
+    focus: ["token_embedding", "position_embedding"],
+    sections: [
+      {
+        heading: "Telling positions apart",
+        paragraphs: [
+          "Self-attention compares vectors by content, and the token embedding says nothing about where a token sits in the text. Apart from the causal mask, attention has no built-in notion of order, so this model adds an explicit position signal.",
+          "It uses a second learned table with one row per position, from 0 up to the context length minus one. The vector for position t is added to the token embedding of the character at position t, so the same character at two places gets two different vectors.",
+          "Because the table has exactly block_size rows, the model cannot represent positions beyond it. That is why generation feeds the model only the last block_size characters, and why a longer prompt is cropped.",
+          "The original Transformer paper used fixed sine and cosine patterns instead of a learned table. This project learns the table, which is the simpler choice.",
+        ],
+      },
+      {
+        heading: "The demo",
+        paragraphs: [
+          "The position embedding has no batch dimension: its output has one row per position and n_embd columns. Adding it to the token embedding keeps the shape of (1, positions, n_embd).",
+        ],
+      },
+    ],
+    equations: [{ label: "Adding position information", text: "x[t] = E_tok[id[t]] + E_pos[t]" }],
+  },
   {
     id: "self-attention",
     title: "Self-attention",
@@ -116,10 +170,109 @@ export const MODULES: LearnModule[] = [
       { label: "Equal weights over the past", text: "y[i] = (1 / (i + 1)) * sum over j <= i of x[j]" },
     ],
   },
-  todo("multi-head-attention", "Multi-head attention", "Several attention patterns in parallel."),
-  todo("feed-forward", "Feed-forward networks", "The per-position computation after attention."),
-  todo("residual-connections", "Residual connections", "Why blocks add their input back."),
-  todo("layernorm", "LayerNorm", "Keeping activations in a workable range."),
+  {
+    id: "multi-head-attention",
+    title: "Multi-head attention",
+    summary: "Several attention patterns in parallel.",
+    written: true,
+    demo: "heads",
+    sections: [
+      {
+        heading: "Splitting the width",
+        paragraphs: [
+          "Instead of one attention pattern per layer, the layer runs several heads side by side. Each head has its own query, key and value layers and works on a smaller vector of size n_embd divided by the number of heads.",
+          "The heads' outputs are concatenated back to the full width and mixed by one more linear layer. Concatenating n_head vectors of size head_size gives exactly n_embd numbers again.",
+          "More heads therefore does not mean more weights: each head is smaller. The parameter count of this model is the same for 1, 2, 4 or 8 heads, and a test in this project checks that.",
+          "In this project the heads run in a plain Python loop over separate modules. That is clearer to read than one fused operation, but slower.",
+        ],
+      },
+      {
+        heading: "Do more heads help?",
+        paragraphs: [
+          "In the Experiment Lab, the number of heads (1, 2, 4 and 8) made no detectable difference to validation loss at this model size. Across two seeds, the spread between head counts (0.018 to 0.027) was the same size as the seed-to-seed variation of a single setting, so a small benefit cannot be ruled in or out. The effect may appear in larger models, but these experiments do not show it.",
+        ],
+      },
+    ],
+    equations: [
+      { label: "Multi-head attention", text: "MHA(x) = Concat(head_1, ..., head_h) W_O" },
+      { label: "Head size", text: "head_size = n_embd / n_head" },
+    ],
+  },
+  {
+    id: "feed-forward",
+    title: "Feed-forward networks",
+    summary: "The per-position computation after attention.",
+    written: true,
+    demo: "ffn",
+    sections: [
+      {
+        heading: "Think per position",
+        paragraphs: [
+          "Attention moves information between positions. The feed-forward network then processes each position on its own, with the same weights at every position.",
+          "It is two linear layers with a ReLU between them. The hidden layer is four times wider than the model, so a vector of n_embd numbers is expanded to 4 x n_embd, passed through the ReLU, and projected back down to n_embd.",
+          "This is where most of a block's parameters live. Per layer it holds 8 x n_embd squared plus 5 x n_embd parameters. For the default model that is 33,088 per layer and 132,352 for all four layers, which is the feed-forward line you see in the Architecture Explorer.",
+        ],
+      },
+      {
+        heading: "The demo",
+        paragraphs: [
+          "The table lists the real tensors of the first block's feed-forward network, read from the selected checkpoint, with their shapes and parameter counts.",
+        ],
+      },
+    ],
+    equations: [{ label: "Feed-forward network", text: "FFN(x) = W2 ReLU(W1 x + b1) + b2" }],
+  },
+  {
+    id: "residual-connections",
+    title: "Residual connections",
+    summary: "Why blocks add their input back.",
+    written: true,
+    demo: "shapes",
+    focus: ["token_embedding", "blocks."],
+    sections: [
+      {
+        heading: "Adding instead of replacing",
+        paragraphs: [
+          "Each sublayer in a block, the attention and the feed-forward network, does not replace its input. Its output is added to the input: x becomes x plus the sublayer's result.",
+          "This gives gradients a direct path back through every block during training, and it lets a block start by doing little and learn only a correction. A test in this project checks the property: if both sublayers output zero, the block returns its input unchanged.",
+          "Because the output is added to the input, the shape never changes inside a block. The vectors that go in and come out always have n_embd numbers per position.",
+        ],
+      },
+      {
+        heading: "The demo",
+        paragraphs: [
+          "The forward-pass table shows the real output of every block for your prompt. The shape is the same after each one, and the statistics show how the size of the activations changes as they pass through the stack.",
+        ],
+      },
+    ],
+    equations: [
+      { label: "One block (pre-norm)", text: "x = x + MHA(LN(x));  x = x + FFN(LN(x))" },
+    ],
+  },
+  {
+    id: "layernorm",
+    title: "LayerNorm",
+    summary: "Keeping activations in a workable range.",
+    written: true,
+    demo: "layernorm",
+    sections: [
+      {
+        heading: "Normalising one position",
+        paragraphs: [
+          "Layer normalisation rescales the vector at each position on its own: it subtracts the mean of the n_embd numbers, divides by their standard deviation (with a tiny constant added for safety), and then applies a learned scale and a learned shift.",
+          "The learned scale starts at 1 and the shift at 0, so at the start it only standardises. During training the model can change both.",
+          "This model normalises before each sublayer rather than after it. There is a LayerNorm in front of the attention, one in front of the feed-forward network, and a final one before the output layer. For the default model that is 4 x 4 x 64 + 128 = 1,152 parameters in total.",
+        ],
+      },
+      {
+        heading: "The demo",
+        paragraphs: [
+          "Change the mean and spread of a small vector and watch the result. It uses a scale of 1 and a shift of 0, as a freshly created LayerNorm does, and it is computed in your browser, not by the model.",
+        ],
+      },
+    ],
+    equations: [{ label: "Layer normalisation", text: "LN(x) = gamma * (x - mean(x)) / sqrt(var(x) + eps) + beta" }],
+  },
   {
     id: "autoregressive-generation",
     title: "Autoregressive generation",
@@ -147,7 +300,34 @@ export const MODULES: LearnModule[] = [
       { label: "Temperature softmax", text: "p[i] = exp(z[i] / T) / sum over j of exp(z[j] / T)" },
     ],
   },
-  todo("training", "Training and backpropagation", "How the weights are adjusted."),
+  {
+    id: "training",
+    title: "Training and backpropagation",
+    summary: "How the weights are adjusted.",
+    written: true,
+    demo: "shift",
+    sections: [
+      {
+        heading: "Inputs and targets",
+        paragraphs: [
+          "Each training step takes random windows of the training text. The target is the same window shifted one character to the right, so at every position the model is asked to predict the character that really comes next. One window of length T therefore gives T separate prediction problems.",
+          "The last tenth of the text is held back and never trained on. Its loss, the validation loss, shows how well the model handles text it has not seen, and a growing gap between training and validation loss is the sign of overfitting.",
+        ],
+      },
+      {
+        heading: "Backpropagation and the update",
+        paragraphs: [
+          "The loss is a single number computed from all the weights. Backpropagation applies the chain rule backwards through the network to find how much each weight contributed, which gives the gradient of the loss with respect to every weight.",
+          "The optimiser, AdamW, uses those gradients to move every weight a small step that should lower the loss. In this project the learning rate is constant (there is no schedule), weight decay is 0.01, and the gradient norm is clipped to 1.0 so one unusual batch cannot cause a huge update.",
+          "Every evaluation interval the loss is measured over several batches for both the training and the validation text, with dropout switched off. The Training Lab plots those measurements live.",
+        ],
+      },
+    ],
+    equations: [
+      { label: "One AdamW step (per weight w, gradient g)", text: "w <- w - lr * ( m_hat / (sqrt(v_hat) + eps) + weight_decay * w )" },
+      { label: "Targets are the input shifted by one", text: "x = text[i : i + T],   y = text[i + 1 : i + T + 1]" },
+    ],
+  },
 ];
 
 export const FIRST_MODULE_ID = "language-modelling";

@@ -23,3 +23,17 @@ export function parseNumberList(
   }
   return { values };
 }
+
+export function layerNorm(values: number[], eps = 1e-5): { mean: number; std: number; output: number[] } {
+  const n = values.length;
+  const mean = values.reduce((a, b) => a + b, 0) / n;
+  const variance = values.reduce((a, b) => a + (b - mean) ** 2, 0) / n; // population variance
+  const denom = Math.sqrt(variance + eps);
+  return { mean, std: Math.sqrt(variance), output: values.map((v) => (v - mean) / denom) };
+}
+
+/** What the model sees and must predict at each position of a text. */
+export function nextCharPairs(text: string): { context: string; target: string }[] {
+  const chars = [...text];
+  return chars.slice(1).map((target, i) => ({ context: chars.slice(0, i + 1).join(""), target }));
+}

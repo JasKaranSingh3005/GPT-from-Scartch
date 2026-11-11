@@ -18,10 +18,11 @@ and run controlled experiments on it.
 | Experiment Lab | Run the experiment suite, compare batches and seeds, export CSV |
 | Model Comparison | Compare checkpoints side by side with the same prompt and seed |
 | Settings | API and device status, theme, generation defaults |
-
+| The Learning Center has twelve short modules (tokenization through backpropagation) |
 Nothing in the UI is simulated. Every number comes from the backend, which reads checkpoints,
 `summary.json` files, or a live PyTorch call. If something isn't available, the page says so.
-The Learning Center page is not built yet and shows an "under development" state.
+The Learning Center has twelve short modules (tokenization through backpropagation). Demos that
+involve a model call the real backend; the few worked examples that run in your browser say so.
 
 
 ## Architecture
@@ -153,7 +154,7 @@ The compose stack end to end and a live deployment have **not** been verified.
 
 ## Roadmap
 
-Learning Center content, Playwright end-to-end tests, mixed precision, a KV-cache option
+Playwright end-to-end tests, mixed precision, a KV-cache option
 benchmarked against the baseline, and a verified hosted demo.
 
 ## Original Streamlit app

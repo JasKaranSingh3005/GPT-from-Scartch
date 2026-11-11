@@ -21,11 +21,12 @@ export function LearningCenter() {
   return (
     <div className="space-y-4">
       <h1 className="text-xl font-semibold text-slate-50">Learning Center</h1>
-      <p className="max-w-3xl text-sm text-slate-400">
-        How the model works, one idea at a time. Demos that involve a model call the real backend.
-        {" "}{writtenCount} of {MODULES.length} modules are written; the rest are marked and will
-        say so if you open them.
-      </p>
+        <p className="max-w-3xl text-sm text-slate-400">
+        How the model works, one idea at a time. Demos that involve a model call the real backend;
+        worked examples that run in your browser say so.
+        {writtenCount < MODULES.length &&
+          ` ${writtenCount} of ${MODULES.length} modules are written; the rest are marked.`}
+        </p>
 
       <div className="grid gap-4 lg:grid-cols-[240px_minmax(0,1fr)]">
         <nav aria-label="Modules">

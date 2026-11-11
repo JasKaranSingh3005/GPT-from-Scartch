@@ -2,16 +2,26 @@ import { Card } from "../../components/ui/Card";
 import { EmptyState } from "../../components/ui/states";
 import { AttentionDemo } from "./demos/AttentionDemo";
 import { CausalMaskDemo } from "./demos/CausalMaskDemo";
+import { FeedForwardDemo } from "./demos/FeedForwardDemo";
+import { HeadsDemo } from "./demos/HeadsDemo";
+import { LayerNormDemo } from "./demos/LayerNormDemo";
+import { ShapesDemo } from "./demos/ShapesDemo";
+import { ShiftDemo } from "./demos/ShiftDemo";
 import { TemperatureDemo } from "./demos/TemperatureDemo";
 import { TokenizerDemo } from "./demos/TokenizerDemo";
 import type { DemoKey, LearnModule } from "./modules";
 
-function Demo({ demo, modelId }: { demo: DemoKey; modelId: string | null }) {
+function Demo({ demo, modelId, focus }: { demo: DemoKey; modelId: string | null; focus?: string[] }) {
   switch (demo) {
     case "tokenizer": return <TokenizerDemo modelId={modelId} />;
     case "causal-mask": return <CausalMaskDemo />;
     case "attention": return <AttentionDemo modelId={modelId} />;
     case "temperature": return <TemperatureDemo modelId={modelId} />;
+    case "shapes": return <ShapesDemo modelId={modelId} focus={focus} />;
+    case "heads": return <HeadsDemo modelId={modelId} />;
+    case "ffn": return <FeedForwardDemo modelId={modelId} />;
+    case "layernorm": return <LayerNormDemo />;
+    case "shift": return <ShiftDemo />;
   }
 }
 
@@ -46,7 +56,7 @@ export function ModuleView({ module, modelId }: { module: LearnModule; modelId: 
       </Card>
       {module.demo && (
         <Card title="Try it">
-          <Demo demo={module.demo} modelId={modelId} />
+          <Demo demo={module.demo} modelId={modelId} focus={module.focus} />
         </Card>
       )}
     </div>
