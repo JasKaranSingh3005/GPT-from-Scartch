@@ -27,6 +27,7 @@ disabled. Model IDs look like `gpt_small:best`.
 | POST | `/generate` | text, timing, tokens/s, device, seed |
 | POST | `/generate/stream` | Server-Sent Events: `start`, `token`, `done`, `error` |
 | POST | `/generate/compare` | 2 to 4 variants, one shared seed; variants may override model, temperature, top-k |
+| POST | `/generate/distribution` | next-token probabilities after temperature and top-k; nothing is sampled |
 
 Request: `model_id`, `prompt`, `max_new_tokens` (capped by `GPTLAB_MAX_NEW_TOKENS`),
 `temperature` (0 < t <= 5), `top_k`, `seed`. A seed reproduces output on the same device type

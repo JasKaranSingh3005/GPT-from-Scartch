@@ -11,6 +11,8 @@ from backend.schemas.generation import (
     CompareResult,
     GenerateRequest,
     GenerateResponse,
+    DistributionRequest, 
+    DistributionResponse,
 )
 from backend.services.inference import (
     GenerationParams,
@@ -18,6 +20,7 @@ from backend.services.inference import (
     check_limits,
     run_generation,
     stream_tokens,
+    next_distribution,
 )
 from backend.services.model_registry import LoadedModel, ModelRegistry
 import torch
@@ -116,3 +119,10 @@ def compare(body: CompareRequest, registry: RegistryDep, settings: SettingsDep) 
         results.append(CompareResult(label=variant.label,
                                      result=_response(run_generation(registry, loaded, params))))
     return CompareResponse(seed=body.seed, results=results)
+
+@router.post("/distribution", response_model=DistributionResponse)
+def distribution(body: DistributionRequest, registry: RegistryDep) -> DistributionResponse:
+    """Next-token probabilities for a prompt, after temperature and top-k. Nothing is sampled."""
+    loaded = _loaded(registry, body.model_id)
+    return DistributionResponse(**next_distribution(
+        registry, loaded, body.prompt, body.temperature, body.top_k, body.top_n))

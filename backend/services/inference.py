@@ -7,7 +7,7 @@ from typing import Iterator
 import torch
 
 from backend.services.model_registry import LoadedModel, ModelRegistry
-from models.sampling import encode_prompt, generate_stream
+from models.sampling import encode_prompt, generate_stream, next_token_probs
 
 
 class InvalidRequestError(Exception):
@@ -107,3 +107,27 @@ def run_generation(
         device=str(loaded.device),
         seed=params.seed,
     )
+    
+def next_distribution(
+    registry: ModelRegistry, loaded: LoadedModel, prompt: str,
+    temperature: float, top_k: int | None, top_n: int,
+) -> dict:
+    """The exact distribution the sampler draws the next token from, most likely first."""
+    idx = prepare(loaded, prompt)  # empty prompt -> newline; unknown characters -> 422
+    block = getattr(loaded.model, "block_size", None)  # the bigram has no context limit
+    cropped = bool(block and idx.shape[1] > block)
+    if block:
+        idx = idx[:, -block:]
+    with registry.inference_lock, torch.inference_mode():
+        logits, _ = loaded.model(idx)
+    probs = next_token_probs(logits[:, -1, :], temperature, top_k)[0].float().cpu()
+    top = torch.topk(probs, min(top_n, probs.numel()))
+    entries = [
+        {"id": int(i), "char": loaded.tokenizer.itos[int(i)], "probability": float(p)}
+        for p, i in zip(top.values, top.indices)
+    ]
+    return {
+        "model_id": loaded.model_id, "prompt_tokens": int(idx.shape[1]), "cropped": cropped,
+        "temperature": temperature, "top_k": top_k,
+        "shown_mass": float(sum(e["probability"] for e in entries)), "entries": entries,
+    }

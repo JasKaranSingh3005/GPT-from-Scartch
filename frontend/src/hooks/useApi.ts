@@ -159,3 +159,15 @@ export const useExperimentCompare = (ids: string[]) =>
   });
 
 export const useRunExperiments = () => useJobMutation(api.runExperiments);
+
+export const useDistribution = (
+  modelId: string | null, prompt: string, temperature: number, topK: number | null,
+) =>
+  useQuery({
+    queryKey: ["distribution", modelId, prompt, temperature, topK],
+    queryFn: () =>
+      api.distribution({ model_id: modelId as string, prompt, temperature, top_k: topK, top_n: 12 }),
+    enabled: modelId !== null,
+    retry: false,
+    placeholderData: keepPreviousData,
+  });

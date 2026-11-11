@@ -35,6 +35,6 @@ export const NAV_ITEMS: NavItem[] = [
   { path: "/attention", label: "Attention Visualizer", icon: Boxes, group: "Inspect", implemented: true },
   { path: "/tokenizer", label: "Tokenizer Explorer", icon: Type, group: "Inspect", implemented: true },
   { path: "/compare", label: "Model Comparison", icon: GitCompare, group: "Inspect", implemented: true },
-  { path: "/learn", label: "Learning Center", icon: BookOpen, group: "Learn", implemented: false },
+  { path: "/learn", label: "Learning Center", icon: BookOpen, group: "Learn", implemented: true },
   { path: "/settings", label: "Settings", icon: Settings, group: "System", implemented: false },
 ];

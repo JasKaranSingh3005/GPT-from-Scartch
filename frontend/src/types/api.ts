@@ -340,3 +340,24 @@ export interface ExperimentCompareResponse {
   run_ids: string[];
   variants: ExperimentCompareVariant[];
 }
+export interface DistributionRequest {
+  model_id: string;
+  prompt: string;
+  temperature: number;
+  top_k: number | null;
+  top_n: number;
+}
+export interface DistributionEntry {
+  id: number;
+  char: string;
+  probability: number;
+}
+export interface DistributionResponse {
+  model_id: string;
+  prompt_tokens: number;
+  cropped: boolean;
+  temperature: number;
+  top_k: number | null;
+  shown_mass: number;
+  entries: DistributionEntry[];
+}

@@ -23,7 +23,9 @@ import type {
   BatchSummary, 
   ExperimentCompareResponse, 
   ExperimentList, 
-  ExperimentRunRequest
+  ExperimentRunRequest,
+  DistributionRequest, 
+  DistributionResponse
 } from "../types/api";
 
 export const API_BASE = (import.meta.env.VITE_API_URL ?? "http://localhost:8000/api/v1").replace(
@@ -107,6 +109,7 @@ export const api = {
   experimentRun: (id: string) => request<BatchDetail>(`/experiments/runs/${encodeURIComponent(id)}`),
   runExperiments: (body: ExperimentRunRequest) =>request<TrainingJob>("/experiments/run", post(body)),
   experimentCompare: (ids: string[]) =>request<ExperimentCompareResponse>(`/experiments/compare?${ids.map((i) => `run_ids=${encodeURIComponent(i)}`).join("&")}`,),
+  distribution: (body: DistributionRequest) =>request<DistributionResponse>("/generate/distribution", post(body)),
 };
 
 export const experimentCsvUrl = (id: string) =>`${API_BASE}/experiments/export/${encodeURIComponent(id)}`;

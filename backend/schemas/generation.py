@@ -66,3 +66,26 @@ class CompareResponse(ApiModel):
 
 
 StreamEventType = Literal["start", "token", "done", "error"]
+
+class DistributionRequest(ApiModel):
+    model_id: str = Field(min_length=1, max_length=130)
+    prompt: str = Field(default="", max_length=4000)
+    temperature: float = Field(default=0.8, gt=0, le=5.0)
+    top_k: int | None = Field(default=None, ge=1)
+    top_n: int = Field(default=12, ge=1, le=100)  # how many candidates to return
+
+
+class DistributionEntry(ApiModel):
+    id: int
+    char: str
+    probability: float
+
+
+class DistributionResponse(ApiModel):
+    model_id: str
+    prompt_tokens: int  # tokens the model actually saw (after cropping)
+    cropped: bool
+    temperature: float
+    top_k: int | None
+    shown_mass: float  # total probability of the returned entries
+    entries: list[DistributionEntry]  # most likely first
