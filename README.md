@@ -18,11 +18,10 @@ and run controlled experiments on it.
 | Experiment Lab | Run the experiment suite, compare batches and seeds, export CSV |
 | Model Comparison | Compare checkpoints side by side with the same prompt and seed |
 | Settings | API and device status, theme, generation defaults |
-| The Learning Center has twelve short modules (tokenization through backpropagation) |
+| The Learning Center | Has twelve short modules (tokenization through backpropagation). Demos that
+involve a model call the real backend; the few worked examples that run in your browser say so |
 Nothing in the UI is simulated. Every number comes from the backend, which reads checkpoints,
 `summary.json` files, or a live PyTorch call. If something isn't available, the page says so.
-The Learning Center has twelve short modules (tokenization through backpropagation). Demos that
-involve a model call the real backend; the few worked examples that run in your browser say so.
 
 
 ## Architecture
@@ -123,8 +122,12 @@ cd frontend && npm run typecheck
 
 Tests that need the dataset or trained checkpoints skip themselves, so a fresh clone runs
 green on CPU. GitHub Actions runs the Python suite, the frontend checks and build, and a Docker
-build with an API smoke test (see `.github/workflows/ci.yml`). There are no browser
-end-to-end tests yet.
+build with an API smoke test (see `.github/workflows/ci.yml`).
+
+Playwright end-to-end tests (`cd frontend && npm run e2e`) start an isolated backend with a
+tiny randomly initialised model and drive a real browser through every page, streaming
+generation (including Stop and regenerate), the attention heatmap, the architecture diagram,
+and a real training job over the WebSocket.
 
 ## Docker and deployment
 
@@ -154,7 +157,7 @@ The compose stack end to end and a live deployment have **not** been verified.
 
 ## Roadmap
 
-Playwright end-to-end tests, mixed precision, a KV-cache option
+Mixed precision, a KV-cache option
 benchmarked against the baseline, and a verified hosted demo.
 
 ## Original Streamlit app
